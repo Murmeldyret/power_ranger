@@ -1,0 +1,35 @@
+// Language: jsonc
+{
+    "routerType": [
+        {
+            "id": 0,
+            "Type": "fafb",
+            "bandwidth": "10G", //Gigabits per second
+            "wakeupTime": "50ms",
+            "latency": "1ms",
+            "powerConsumption": {
+                "idle": "50W",
+                "peak": "250W",
+                "sleep": "10W"
+            },
+            "packetMemory": "16K" //Kilobytes
+        }
+    ],
+    "trafficType": [
+        {
+            "id": 0,
+            "type": "Pawnography",
+            "latencySensitivity": "1000ms", //Den er vel høj. Det skal bare komme.
+            "dataSize": "50M", //Megabytes
+            "packetLossSensitivity": "low" //low, medium, high
+        },
+        {
+            "id": 1,
+            "type": "VoIP",
+            "latencySensitivity": "50ms",
+            "dataSize": "1K",
+            "packetLossSensitivity": "medium"
+        }
+
+    ]
+}
