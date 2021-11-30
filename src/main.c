@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <json-c/json.h>
 #include "data.h"
+#include "simulation.h"
+#include "output.h"
 
 /*
  * main - Entry point

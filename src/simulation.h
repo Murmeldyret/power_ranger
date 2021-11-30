@@ -1,3 +1,11 @@
+#include <igraph/igraph.h>
+
+void run_simulation();
+void populate_network();
+void run_simulation_loop();
+void establish_connections();
+void send_data();
+
 typedef struct chain
 {
     int data;
