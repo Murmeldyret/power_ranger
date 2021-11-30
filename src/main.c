@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <json-c/json.h>
 #include "data.h"
 
 /*
@@ -13,7 +14,8 @@ int main(void)
     
     run_simulation();  //TODO: Make this function
 
-    display_data();    //TODO: Make this function //FIXME Recursively
+    display_data();    //TODO: Make this function
+
     
     return 0;
 }

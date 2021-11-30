@@ -2,7 +2,13 @@
 
 /**
  * Function: run_simulation 
- * Description: 
- * Inputs: 
- * Output:
+ * Description: Run simulation of network
+ * Inputs: Validated data
+ * Output: struct simulationData
  */
+
+void run_simulation() {
+
+
+
+}
