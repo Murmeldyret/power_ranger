@@ -2,5 +2,6 @@
 Power optimisation for computer networks
 
 # Dependencies
-- []: # Language: C
-- []: # JSON-C
+- [ ]: # Language: C
+- [ ]: # JSON-C
+- [ ]: # igraph
