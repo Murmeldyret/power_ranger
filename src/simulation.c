@@ -1,5 +1,7 @@
 #include "simulation.h"
 #include "algorithms.h"
+#include "data.h"
+#include <time.h>
 
 /**
  * Description: Run simulation of network
@@ -20,12 +22,30 @@ void run_simulation()
 void populate_network()
 {
     igraph_t graph;
-    igraph_vector_t dimvector;
+    igraph_vector_t v;
+    igraph_vector_t result;
     igraph_vector_t edges;
     int i;
 
-    igraph_vector_init(&dimvector, 2);
-    VECTOR(dimvector)[0] = 30;
+    igraph_vector_init(&v, 2);
+    VECTOR(v)[0] = 100;
+    VECTOR(v)[1] = 100;
+    // Create graph
+    igraph_lattice(&graph, &v, 0, IGRAPH_UNDIRECTED, false, true);
+    printf("Hello");
+    igraph_rng_seed(igraph_rng_default(), time(NULL));
+    igraph_vector_init(&edges, 50);
+    for (i = 0; i < igraph_vector_size(&edges); i++)
+    {
+        VECTOR(edges)
+        [i] = RNG_INTEGER(0, igraph_vcount(&graph) - 1);
+    }
+
+    igraph_add_edges(&graph, &edges, 0);
+
+    
+
+    printf("graph count %d", igraph_vcount(&graph));
 
     // test 2
 }
@@ -48,7 +68,6 @@ void run_simulation_loop()
  */
 void establish_connections()
 {
-
 }
 
 /**
@@ -58,5 +77,4 @@ void establish_connections()
  */
 void send_data()
 {
-
 }

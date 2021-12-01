@@ -1,5 +1,6 @@
 #include <igraph/igraph.h>
 
+
 void run_simulation();
 void populate_network();
 void run_simulation_loop();

@@ -10,9 +10,11 @@
  */
 bool initialise_data()
 {
+    /*
     FILE = *fp;
     init_routertype();
     init_traffictype();
+    */
 
     return true; // Return true if successful
 }
