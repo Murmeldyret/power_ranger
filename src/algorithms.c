@@ -8,5 +8,5 @@
  */
 void bellman_ford()
 {
-
+    printf("Bellman-Ford algorithm\n");
 }
