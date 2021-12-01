@@ -27,7 +27,7 @@ void populate_network()
     igraph_vector_init(&dimvector, 2);
     VECTOR(dimvector)[0] = 30;
 
-    // test
+    // test 2
 }
 
 /**
