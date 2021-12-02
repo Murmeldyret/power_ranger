@@ -21,33 +21,31 @@ void run_simulation()
  */
 void populate_network()
 {
+    // Initialize variables
     igraph_t graph;
-    igraph_vector_t v;
-    igraph_vector_t result;
+    igraph_vector_t dimvec;
     igraph_vector_t edges;
     int i;
 
-    igraph_vector_init(&v, 2);
-    VECTOR(v)[0] = 100;
-    VECTOR(v)[1] = 100;
-    // Create graph
-    igraph_lattice(&graph, &v, 0, IGRAPH_UNDIRECTED, false, true);
-    printf("Hello");
-    igraph_rng_seed(igraph_rng_default(), time(NULL));
-    igraph_vector_init(&edges, 50);
-    for (i = 0; i < igraph_vector_size(&edges); i++)
-    {
-        VECTOR(edges)
-        [i] = RNG_INTEGER(0, igraph_vcount(&graph) - 1);
-    }
+    // Initialize graph
+    igraph_barabasi_game(/* graph=    */ &graph,
+                         /* n=        */ 100,
+                         /* power=    */ 1.0,
+                         /* m=        */ 3,
+                         /* outseq=   */ 0,
+                         /* outpref=  */ 0,
+                         /* A=        */ 1.0,
+                         /* directed= */ IGRAPH_DIRECTED,
+                         /* algo=     */ IGRAPH_BARABASI_PSUMTREE,
+                         /* start_from= */ 0);
 
-    igraph_add_edges(&graph, &edges, 0);
+    printf("Graph created\n");
+    // Print edge count in graph
+    printf("Edge count: %d\n", igraph_ecount(&graph));
+    // Print vertex count in graph
+    printf("Vertex count: %d\n", igraph_vcount(&graph));
 
     
-
-    printf("graph count %d", igraph_vcount(&graph));
-
-    // test 2
 }
 
 /**
@@ -62,9 +60,9 @@ void run_simulation_loop()
 }
 
 /**
- * Description: Connection between nodes and edges 
- * Inputs: 
- * Output: 
+ * Description: Connection between nodes and edges
+ * Inputs:
+ * Output:
  */
 void establish_connections()
 {
@@ -72,8 +70,8 @@ void establish_connections()
 
 /**
  * Description: Send data between nodes and edges
- * Inputs: 
- * Output: 
+ * Inputs:
+ * Output:
  */
 void send_data()
 {
