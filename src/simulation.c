@@ -28,6 +28,7 @@ void populate_network()
     int i;
 
     // Initialize graph
+    // TODO: Add dynamic graph size
     igraph_barabasi_game(/* graph=    */ &graph,
                          /* n=        */ 100,
                          /* power=    */ 1.0,
