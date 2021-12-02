@@ -45,6 +45,9 @@ void populate_network()
     printf("Edge count: %d\n", igraph_ecount(&graph));
     // Print vertex count in graph
     printf("Vertex count: %d\n", igraph_vcount(&graph));
+    
+    // Free memory
+    igraph_destroy(&graph);
 
     
 }
