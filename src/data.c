@@ -33,7 +33,7 @@ void readRouterType()
     }
 
     int routerId;
-    char type[5];
+    char type[512];
 
     char line[512];
 
