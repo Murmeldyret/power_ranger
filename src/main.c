@@ -9,7 +9,7 @@
  */
 int main(void)
 {
-    printf("🗿ඞ\n");
+    printf("🗿ඞ\n");  //! DO NOT REMOVE!!!
     
     initialise_data(); //TODO: Make this function
     
