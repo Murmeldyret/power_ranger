@@ -10,8 +10,21 @@
  */
 void run_simulation()
 {
-    populate_network(100,3);
+    // Initialize variables for populate network
+    int nodes;
+    int edges;
+    igraph_t graph;
+
+    nodes = 100;
+    edges = 3;
+
+    // Initialize array of Router
+
+    populate_network(nodes, edges, &graph);
     run_simulation_loop();
+
+    // Free memory
+    igraph_destroy(&graph);
 }
 
 /**
@@ -19,17 +32,16 @@ void run_simulation()
  * Inputs: Validated data
  * Output: struct graph
  */
-void populate_network(int nodes, int edges_per_node)
+void populate_network(int nodes, int edges_per_node, igraph_t *graph)
 {
     // Initialize variables
-    igraph_t graph;
     igraph_vector_t edges;
     int i;
     int j;
 
     // Initialize graph
     // TODO: Add dynamic graph size
-    igraph_barabasi_game(/* graph=    */ &graph,
+    igraph_barabasi_game(/* graph=    */ graph,
                          /* n=        */ nodes,
                          /* power=    */ 1.0,
                          /* m=        */ edges_per_node,
@@ -42,30 +54,6 @@ void populate_network(int nodes, int edges_per_node)
 
     printf("Graph created\n");
 
-
-    // Print edge count in graph
-    printf("Edge count: %d\n", igraph_ecount(&graph));
-    // Print vertex count in graph
-    printf("Vertex count: %d\n", igraph_vcount(&graph));
-
-    // Print first edge in graph
-    igraph_edge(&graph, 15, &i, &j);
-    printf("First edge: %d, %d\n", i, j);
-
-    // Print all edges in graph
-    igraph_vector_init(&edges, 0);
-    igraph_get_edgelist(&graph, &edges, 0);
-    for (i = 0; i < igraph_vector_size(&edges); i++)
-    {
-        printf("Edge %d: %d, %d\n", i, (int)VECTOR(edges)[i], (int)VECTOR(edges)[i+1]);
-    }
-    
-    
-    
-    // Free memory
-    igraph_destroy(&graph);
-
-    
 }
 
 /**
