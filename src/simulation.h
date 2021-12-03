@@ -2,7 +2,7 @@
 
 
 void run_simulation();
-void populate_network();
+void populate_network(int, int);
 void run_simulation_loop();
 void establish_connections();
 void send_data();
