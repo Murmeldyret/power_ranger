@@ -2,6 +2,8 @@
 
 /* Function prototypes */
 bool initialise_data();
+void readRouterType();
+void readTrafficType();
 
 /* Structures */
 struct routerType
