@@ -24,7 +24,7 @@ bool initialise_data()
  */
 void readRouterType()
 {
-    FILE *fp = fopen("routertype.csv", "r");
+    FILE *fp = fopen("config/routerType.csv", "r");
 
     if(!fp)
     {
