@@ -33,13 +33,13 @@ void readRouterType()
     }
 
     int routerId;
-    char type[512];
+    char type[2048];
 
-    char line[512];
+    char line[2048];
 
     char *sp;
 
-    while(fgets(line, 5, fp))
+    while(fgets(line, 512, fp))
     {
         // Reading the line and stops at the comma delimter.
         sp = strtok(line, ",");
