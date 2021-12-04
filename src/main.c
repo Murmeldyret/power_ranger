@@ -11,7 +11,12 @@ int main(void)
 {
     printf("🗿ඞ\n");  //! DO NOT REMOVE!!!
     
-    initialise_data(); //TODO: Make this function
+    /* Initialize variables */
+    struct routerType *routers;
+    struct trafficType *traffic;
+
+
+    initialise_data(routers, traffic); //TODO: Make this function
     
     run_simulation();  //TODO: Make this function
 
