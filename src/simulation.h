@@ -1,6 +1,7 @@
 #include <igraph/igraph.h>
+#include "data.h"
 
-void run_simulation();
+void run_simulation(struct routerType *, struct trafficType *);
 void populate_network(int, int, igraph_t *);
 void run_simulation_loop();
 void establish_connections();

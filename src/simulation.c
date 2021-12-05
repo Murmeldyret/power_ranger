@@ -1,6 +1,5 @@
 #include "simulation.h"
 #include "algorithms.h"
-#include "data.h"
 #include <time.h>
 
 /**
@@ -8,7 +7,7 @@
  * Inputs: Validated data
  * Output: struct simulationData
  */
-void run_simulation()
+void run_simulation(struct routerType *routers, struct trafficType *traffic)
 {
     // Initialize variables for populate network
     int nodes;
@@ -58,7 +57,7 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph)
 
 /**
  * Description: Run simulation loop
- * Inputs: Validated data
+ * Inputs: Validated data, graph
  * Output: struct simulationData
  */
 void run_simulation_loop()
