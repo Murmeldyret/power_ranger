@@ -1,10 +1,5 @@
 #include <stdbool.h>
 
-/* Function prototypes */
-bool initialise_data();
-void readRouterType();
-void readTrafficType();
-
 /* Structures */
 struct routerType
 {
@@ -32,4 +27,10 @@ struct trafficType
     int data_size;
     int packetloss_sensitivity;
 };
+
+
+/* Function prototypes */
+bool initialise_data(struct routerType *, struct trafficType *);
+void readRouterType();
+void readTrafficType();
 

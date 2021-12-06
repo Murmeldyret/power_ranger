@@ -7,9 +7,9 @@
 /**
  * Description: Initializes the data structure
  * Inputs: return parameters - pointer to the data structure
- * Output: struct routertype[], traffictype[]
+ * Output: struct *routertype, *traffictype
  */
-bool initialise_data()
+bool initialise_data(struct routerType *router, struct trafficType *traffic)
 {
     readRouterType();
     // readTrafficType();
