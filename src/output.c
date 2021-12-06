@@ -10,11 +10,19 @@
  * Output: None
  */
 
-
 void display_data()
 {
     //! example simulation data only. Should not be present in final product
     simulationData data;
+    chain path1, path2, path3, path4, *temp;
+    path1.data = 0;
+    path2.data = 1;
+    path3.data = 2;
+    path4.data = 3;
+    path1.next = path2;
+    path2.next = path3;
+    path3.next = path4;
+
     data.total_power_consumption = 1337;
     data.total_links = 2;
     data.total_amount_of_data = 123456789;
@@ -25,5 +33,12 @@ void display_data()
     fprintf(fp, "Amount of links: \n%d\n\n", data.total_links);
     fprintf(fp, "Total amount of data: \n%d\n\n", data.total_amount_of_data);
 
-
+    temp = path1;
+    fprintf(fp, "Path followed\n");
+    do
+    {
+        fprintf(fp, "%d -> ", temp.data);
+        temp = temp->next;
+    } while (temp->next != NULL);
+    frptintf(fp, "\n");
 }
