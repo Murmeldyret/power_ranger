@@ -36,7 +36,7 @@ bool readRouterType()
 {
     FILE *frtp = fopen("config/routerType.csv", "r");
     /* RouterType.csv values are ordered in (seperated by commas) :   id(int), 
-                                                type(string), 
+                                                type(int), 
                                                 bandwidth(int), 
                                                 wakeupTime(int), 
                                                 latency(int), 
@@ -53,97 +53,85 @@ bool readRouterType()
     }
 
     // TODO ryd op i variabler som ikke bliver brugt.
-    char type[5];
-    char line[512];
-    char buffer[100];
-    char linebuffer[100]; 
-    char *sp;
-    char router_type_temp[9][CSV_ROUTERTYPE_CHAR_LEN];
-    //const char delimiters[] = "; ,";
+    
+    
+    char buffer[100]; 
     // TODO routerTypes array skal i main 
     routerType routerTypes[NMBR_OF_ROUTERTPES];
-    int fscanned_elements; 
+    char *token;
+    int i = 0;
+    int j = 1;
+    
+    // loops till eof is reached
+    while (feof(frtp) != true)
+    {
+        // Outputs current line to buffer char array
+        fgets(buffer,100,frtp);
 
-    // Scans one line from routerType.csv
-    // TODO få fscanned_elements til at give 9 ikke 2 (muligvis problem med .type)
-    fscanned_elements = fscanf(frtp, "%d,%s,%d,%d,%d,%d,%d,%d,%d;",
-                            &routerTypes[0].id,
-                            &routerTypes[0].type,
-                            &routerTypes[0].bandwidth,
-                            &routerTypes[0].wakeup_time,
-                            &routerTypes[0].latency,
-                            &routerTypes[0].power->idle,
-                            &routerTypes[0].power->peak,
-                            &routerTypes[0].power->sleep,
-                            &routerTypes[0].packet_memory);
-   //segmentation fault
-   //printf("%s",routerTypes[0].type);
-    if (fscanned_elements != CSV_ROUTERTYPE_NMBR_OF_PROPERTIES)
-    {
-        printf("Expected 9 elements read, only %d read with success\n",fscanned_elements);
-        return false;
-    }
-    printRouterTypeElements(routerTypes[0]);
-    /*while(fgets(line, 512, frtp))
-    {
-        int i = 0;
-        for (i = 0; i < CSV_ROUTERTYPE_NMBR_OF_PROPERTIES; i++)
-        {
-        sp = strtok(line, delimiters);
-        }
-        
-        
-        sp = strtok(NULL, delimiters);
-        printf("%s",sp);
-        
-        i = 0;
+        // Splits buffer into smaller parts delimited by ","
+        token = strtok(buffer,",");
         do
-        {
-            printf("%d\n",i);
-            //copies routerType properties to string array
-            sp = strtok(NULL,delimiters);
-            printf("%s test\n",sp);
-            strcpy(router_type_temp[i], sp = strtok(NULL,delimiters));
-            i++;
-            printf("%d\n",i);
-        } while (strtok(NULL, delimiters)!=NULL);
-        */
-
-        
-        /*
-        // Reads entire line and stops at semicolon delimiter (end of line)
-        linebuffer[100] = strtok(line, ";");
-        strtok(linebuffer,",");
-        
-        // Reading the line and stops at the comma delimter.
-        sp = strtok(line, ",");
-        
-        // Converts the string into an integer. 
-        routerId = atoi(sp);
-
-        // Picks up where it left over at the comman and continue on.
-        sp = strtok(NULL, ",");
-        strcpy(type, sp);
-        
-        sp = strtok(NULL, ",");
-        bandwidth = atoi(sp);
-        printf("\n%d %s", routerId, type);
-        */
+        {     
+            //printf("%s\n",token);
+            //Switches on which struct should get token value
+            switch (j)
+            {
+            case 1:
+                routerTypes[i].id = atoi(token);
+                break;
+            case 2:
+                routerTypes[i].type = atoi(token);
+                break;
+            case 3:
+                routerTypes[i].bandwidth = atoi(token);
+                break;
+            case 4:
+                routerTypes[i].wakeup_time = atoi(token);
+                break;
+            case 5:
+                routerTypes[i].latency = atoi(token);
+                break;
+            case 6:
+                routerTypes[i].power.idle = atoi(token);
+                break;
+            case 7:
+                routerTypes[i].power.peak = atoi(token);
+                break;
+            case 8:
+                routerTypes[i].power.sleep = atoi(token);
+                break;
+            case 9:
+                routerTypes[i].packet_memory = atoi(token);
+                break;
+            default:
+                printf("Expected number from 1-9 but got %d\n", j);
+                return false;
+                break;
+            }
+            token = strtok(NULL,",");
+           j++;
+        }  while (token != NULL);
+        //printf("switch slut\n\n\n\n");
+        i++;
+    }
+    
+    printRouterTypeElements(routerTypes[0]);
     fclose(frtp);
     return true;
     }
 
+//Prints all elements in struct routertype
 void printRouterTypeElements(routerType routerType) 
 {
-    printf("%d\n%s\n%d\n%d\n%d\n%d\n%d\n%d\n%d",
+    printf("\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
                             routerType.id,
                             routerType.type,
                             routerType.bandwidth,
                             routerType.wakeup_time,
                             routerType.latency,
-                            routerType.power->idle,
-                            routerType.power->peak,
-                            routerType.power->sleep,
+                            routerType.power.idle,
+                            routerType.power.peak,
+                            routerType.power.sleep,
                             routerType.packet_memory);
 }
 

@@ -4,21 +4,27 @@
 /* Structures */
 typedef struct routerType
 {
+    // .csv elements appear in same order
     int id;
-    char *type;
+    int type; // 1 = fafb
     int bandwidth; //Mbps
     int wakeup_time; //ms
     int latency; //ms
-    struct powerConsumption *power; //in watt
+    struct power
+    {
+        int idle;
+        int peak;
+        int sleep;
+    } power; //in watt
     int packet_memory; //in bytes
 } routerType;
 
-struct powerConsumption
+/*struct powerConsumption
 {
     int idle;
     int peak;
     int sleep;
-};
+}; */
 
 struct trafficType 
 {
