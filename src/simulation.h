@@ -1,10 +1,10 @@
 #include <igraph/igraph.h>
-#include "data.h"
+#include "algorithms.h"
 
 void run_simulation(struct routerType *, struct trafficType *);
 void populate_network(int, int, igraph_t *);
-void run_simulation_loop();
-void establish_connections();
+void run_simulation_loop(igraph_t *, struct routerType *, struct trafficType *);
+void establish_connections(igraph_t *, struct routerType *, struct trafficType *);
 void send_data();
 
 typedef struct chain
