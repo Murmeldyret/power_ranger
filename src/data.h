@@ -1,21 +1,17 @@
 #include <stdbool.h>
 
-/* Function prototypes */
-bool initialise_data();
-void readRouterType();
-void readTrafficType();
-
+#define ROUTER_TYPE_TYPE_LEN 6 // type length +2
 /* Structures */
-struct routerType
+typedef struct routerType
 {
     int id;
     char *type;
-    int bandwidth;
-    int wakeup_time;
-    int latency;
-    struct powerConsumption *power;
-    int packet_memory;
-};
+    int bandwidth; //Mbps
+    int wakeup_time; //ms
+    int latency; //ms
+    struct powerConsumption *power; //in watt
+    int packet_memory; //in bytes
+} routerType;
 
 struct powerConsumption
 {
@@ -32,4 +28,9 @@ struct trafficType
     int data_size;
     int packetloss_sensitivity;
 };
+/* Function prototypes */
+bool initialise_data();
+bool readRouterType();
+bool readTrafficType();
+void printRouterTypeElements(routerType routerType);
 

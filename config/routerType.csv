@@ -1,2 +1,1 @@
-id,type,bandwidth,wakeupTime,latency,powerIdle,powerPeak,powerSleep,packetMemory
-1,fafb,10G,50ms,1ms,50W,250W,10W,16K
+1,fafb,10000,50,1,50,250,10,16000;
