@@ -20,14 +20,31 @@ void bellman_ford()
  * Inputs: graph, routerType, trafficType
  * Output: weight in vector
  */
-void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, igraph_vector_t *weights)
+void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights)
 {
 
-    printf("hello\n\n");
-    // Print all vertexes
-    printf("Vertexes:\n");
-    
-    
+    for(int i = 0; i < igraph_vcount(graph); i++)
+    {
+        if (utilisation[i] < 80)
+        {
+            igraph_vector_set(weights,i,f(utilisation[i]));
+        }
+        else if (utilisation[i] >= 80)
+        {
+            igraph_vector_set(weights,i,g(utilisation[i]));
+        }
+        else
+        {
+            utilisation[i] = 01;
+        }
+    }
+
+    //print weights
+    for(int i = 0; i < igraph_vcount(graph); i++)
+    {
+        printf("%f\n", VECTOR(*weights)[i]);
+    }
+
 
 }
 

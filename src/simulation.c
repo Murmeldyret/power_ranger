@@ -81,11 +81,22 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
     // Initialise router utilisation array
     utilisation = malloc(sizeof(double) * igraph_vcount(graph));
 
+    // Set utilisation to 0
+    for (int i = 0; i < igraph_vcount(graph); i++)
+    {
+        utilisation[i] = 0;
+    }
+
     // Initialise vector
     igraph_vector_init(&weights, igraph_ecount(graph));
     
 
-    cal_link_weights(graph, routers, traffic, &weights);
+    cal_link_weights(graph, routers, traffic, utilisation, &weights);
+    
+    /* Free memory */
+    free(utilisation);
+    igraph_vector_destroy(&weights);
+
 }
 
 /**
