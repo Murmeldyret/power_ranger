@@ -17,10 +17,8 @@ int main(void)
     //printRouterTypeElements(routertypes[0]);
     //printTrafficTypeElements(traffictypes[1]);
 
-
-    initialise_data(routers, traffic); //TODO: Make this function
     
-    run_simulation(routers, traffic);  //TODO: Make this function
+    run_simulation(routertypes, traffictypes);  //TODO: Make this function
 
     display_data();    //TODO: Make this function
 
