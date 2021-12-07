@@ -18,13 +18,6 @@ void display_data()
     data.total_power_consumption = 1337;
     data.total_links = 2;
     data.total_amount_of_data = 123456789;
-    FILE *fp = fopen("outputs/Output.csv", "w");
-
-    fprintf(fp, "This really be a bruh moment\n");
-    fprintf(fp, "Total power consumption: \n%d\n\n", data.total_power_consumption);
-    fprintf(fp, "Amount of links: \n%d\n\n", data.total_links);
-    fprintf(fp, "Total amount of data: \n%d\n\n", data.total_amount_of_data);
-
     chain *path1, *path2, *path3, *path4, *temp;
 
     path1 = (chain *)malloc(sizeof(chain));
@@ -39,6 +32,14 @@ void display_data()
     path1->next = path2;
     path2->next = path3;
     path3->next = path4;
+
+
+    FILE *fp = fopen("outputs/Output.csv", "w");
+
+    fprintf(fp, "This really be a bruh moment\n");
+    fprintf(fp, "Total power consumption: \n%d\n\n", data.total_power_consumption);
+    fprintf(fp, "Amount of links: \n%d\n\n", data.total_links);
+    fprintf(fp, "Total amount of data: \n%d\n\n", data.total_amount_of_data);
 
     temp = path1;
     fprintf(fp, "Path followed:\n");
