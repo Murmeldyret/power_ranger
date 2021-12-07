@@ -187,7 +187,7 @@ bool readTrafficType(trafficType *traffictypearr)
         return false;
     }
 
-    while (feof(fttp) != true
+    while (feof(fttp) != true)
     {
         fgets(buffer,100,fttp);
         j = 1;
