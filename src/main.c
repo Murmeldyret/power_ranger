@@ -8,11 +8,14 @@
  */
 int main(void)
 {
-    printf("🗿ඞ\n");  //! DO NOT REMOVE!!!
+    routerType routertypes[NMBR_OF_ROUTERTYPES];
+    trafficType traffictypes[NMBR_OF_TRAFFICTYPES];
+    printf("🗿ඞ\n");
     
-    /* Initialize variables */
-    struct routerType *routers;
-    struct trafficType *traffic;
+    initialise_data(routertypes, traffictypes); //TODO: Make this function
+    //prints structs of relevant type
+    //printRouterTypeElements(routertypes[0]);
+    //printTrafficTypeElements(traffictypes[1]);
 
 
     initialise_data(routers, traffic); //TODO: Make this function
