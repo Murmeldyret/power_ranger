@@ -46,10 +46,3 @@ bool readTrafficType(trafficType *traffictypearr);
 void printRouterTypeElements(routerType routerType);
 void printTrafficTypeElements(trafficType trafficType);
 void printTrafficTypeElements(trafficType traffictype);
-
-
-/* Function prototypes */
-bool initialise_data(struct routerType *, struct trafficType *);
-void readRouterType();
-void readTrafficType();
-
