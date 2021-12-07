@@ -17,6 +17,7 @@ int main(void)
     //prints structs of relevant type
     //printRouterTypeElements(routertypes[0]);
     //printTrafficTypeElements(traffictypes[1]);
+
     run_simulation();  //TODO: Make this function
 
     display_data();    //TODO: Make this function

@@ -11,8 +11,9 @@
 /**
  * Description: Initializes the data structure
  * Inputs: return parameters - pointer to the data structure
- * Output: struct routertype[], traffictype[]
+ * Output: struct *routertype, *traffictype
  */
+
 bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
 {
     bool routerType;
@@ -131,6 +132,7 @@ bool readRouterType(routerType *routertypesarr)
     return true;
     }
 
+
 //Prints all elements in routertype routertype
 void printRouterTypeElements(routerType routerType) 
 {
@@ -165,6 +167,8 @@ bool readTrafficType(trafficType *traffictypearr)
     packetlossSensitivity
     id,type,latencySensitivity,dataSize,packetLossSensitivity
     All int
+    
+
 
     Traffictypes:
     Movie = 1
@@ -183,7 +187,7 @@ bool readTrafficType(trafficType *traffictypearr)
         return false;
     }
 
-    while (feof(fttp) != true)
+    while (feof(fttp) != true
     {
         fgets(buffer,100,fttp);
         j = 1;

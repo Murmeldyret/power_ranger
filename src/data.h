@@ -1,9 +1,11 @@
 #include <stdbool.h>
 
+
 #define NMBR_OF_ROUTERTYPES 1 //number of routertypes from routerType.csv
 #define NMBR_OF_TRAFFICTYPES 2 // number of routertypes from trafficTypes.csv
 #define ROUTER_TYPE_TYPE_LEN 6 // type length +2
 // Types, prototypes and functions (in order :))
+
 /* Structures */
 typedef struct routerType
 {
@@ -44,4 +46,10 @@ bool readTrafficType(trafficType *traffictypearr);
 void printRouterTypeElements(routerType routerType);
 void printTrafficTypeElements(trafficType trafficType);
 void printTrafficTypeElements(trafficType traffictype);
+
+
+/* Function prototypes */
+bool initialise_data(struct routerType *, struct trafficType *);
+void readRouterType();
+void readTrafficType();
 
