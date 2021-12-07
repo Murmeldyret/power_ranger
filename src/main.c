@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "data.h"
 #include "simulation.h"
 #include "output.h"
 
@@ -18,7 +17,10 @@ int main(void)
     //printRouterTypeElements(routertypes[0]);
     //printTrafficTypeElements(traffictypes[1]);
 
-    run_simulation();  //TODO: Make this function
+
+    initialise_data(routers, traffic); //TODO: Make this function
+    
+    run_simulation(routers, traffic);  //TODO: Make this function
 
     display_data();    //TODO: Make this function
 

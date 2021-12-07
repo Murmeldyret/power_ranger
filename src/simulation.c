@@ -1,6 +1,4 @@
 #include "simulation.h"
-#include "algorithms.h"
-#include "data.h"
 #include <time.h>
 
 /**
@@ -8,7 +6,7 @@
  * Inputs: Validated data
  * Output: struct simulationData
  */
-void run_simulation()
+void run_simulation(struct routerType *routers, struct trafficType *traffic)
 {
     // Initialize variables for populate network
     int nodes;
@@ -21,7 +19,7 @@ void run_simulation()
     // Initialize array of Router
 
     populate_network(nodes, edges, &graph);
-    run_simulation_loop();
+    run_simulation_loop(&graph, routers, traffic);
 
     // Free memory
     igraph_destroy(&graph);
@@ -40,7 +38,6 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph)
     int j;
 
     // Initialize graph
-    // TODO: Add dynamic graph size
     igraph_barabasi_game(/* graph=    */ graph,
                          /* n=        */ nodes,
                          /* power=    */ 1.0,
@@ -53,17 +50,17 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph)
                          /* start_from= */ 0);
 
     printf("Graph created\n");
-
 }
 
 /**
  * Description: Run simulation loop
- * Inputs: Validated data
+ * Inputs: Validated data, graph
  * Output: struct simulationData
  */
-void run_simulation_loop()
+void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic)
 {
-    establish_connections();
+
+    establish_connections(graph, routers, traffic);
     send_data();
 }
 
@@ -72,8 +69,34 @@ void run_simulation_loop()
  * Inputs:
  * Output:
  */
-void establish_connections()
+void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic)
 {
+    // TODO: Move variables outside of the function.
+
+
+    // Initialize variables
+    double *utilisation;
+    igraph_vector_t weights;
+    
+    // Initialise router utilisation array
+    utilisation = malloc(sizeof(double) * igraph_vcount(graph));
+
+    // Set utilisation to 0
+    for (int i = 0; i < igraph_vcount(graph); i++)
+    {
+        utilisation[i] = 0;
+    }
+
+    // Initialise vector
+    igraph_vector_init(&weights, igraph_ecount(graph));
+    
+
+    cal_link_weights(graph, routers, traffic, utilisation, &weights);
+    
+    /* Free memory */
+    free(utilisation);
+    igraph_vector_destroy(&weights);
+
 }
 
 /**
