@@ -20,12 +20,7 @@ void bellman_ford()
  */
 void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights)
 {
-    // Fill utilisation with random values between 0 and 100
-    for (int i = 0; i < igraph_vcount(graph); i++)
-    {
-        utilisation[i] = (((double)rand() / RAND_MAX) * 100);
-    }
-
+    
     for (int i = 0; i < igraph_vcount(graph); i++)
     {
         if (utilisation[i] < 80)
@@ -40,12 +35,6 @@ void cal_link_weights(igraph_t *graph, struct routerType *routers, struct traffi
         {
             utilisation[i] = 0;
         }
-    }
-
-    //print weights
-    for (int i = 0; i < igraph_vcount(graph); i++)
-    {
-        printf("%f\n", VECTOR(*weights)[i]);
     }
 }
 
