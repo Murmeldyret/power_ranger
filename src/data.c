@@ -4,14 +4,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define CSV_ROUTERTYPE_MAX_LEN 100
-#define CSV_ROUTERTYPE_NMBR_OF_PROPERTIES 9
-#define CSV_ROUTERTYPE_CHAR_LEN 10 //Max length of an element in routerType.csv excluding first line
+#define CSV_LINE_LEN 100
 
 /**
- * Description: Initializes the data structure
+ * Description: Reads .csv files and outputs to data structures
  * Inputs: return parameters - pointer to the data structure
- * Output: struct *routertype, *traffictype
+ * Output: struct *routertypearray, *traffictypearray
  */
 
 bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
@@ -32,8 +30,6 @@ bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
         printf("Error in readTrafficType \n");
         return false;
     }
-    
-
     return true;
 }
 
@@ -45,6 +41,11 @@ bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
 bool readRouterType(routerType *routertypesarr) 
 {
     // TODO variabler herop
+    // TODO ryd op i variabler som ikke bliver brugt.
+    char buffer[CSV_LINE_LEN]; 
+    char *token;
+    int i = 0;
+    int j = 1;
     FILE *frtp = fopen("config/routerType.csv", "r");
     /* RouterType.csv values are ordered in (seperated by commas) :   id(int), 
                                                 type(int), 
@@ -62,36 +63,23 @@ bool readRouterType(routerType *routertypesarr)
         printf("Error in opening routerType.csv \n");
         return false;
     }
-
-    // TODO ryd op i variabler som ikke bliver brugt.
-    
-    
-    char buffer[100]; 
-    // TODO routerTypes array skal i main 
-    //routerType routerTypes[NMBR_OF_ROUTERTYPES];
-    char *token;
-    int i = 0;
-    int j = 1;
-    
-    // loops till eof is reached
+    // loops until eof is reached
     while (feof(frtp) != true)
     {
         // Outputs current line to buffer char array
-        fgets(buffer,100,frtp);
+        fgets(buffer,CSV_LINE_LEN,frtp);
 
         // Splits buffer into smaller parts delimited by ","
         token = strtok(buffer,",");
         do
         {     
-            //printf("%s\n",token);
-            //Switches on which struct should get token value
+            //Switches on which struct elements should get token value
             switch (j)
             {
             case 1:
                 routertypesarr[i].id = atoi(token);
                 break;
             case 2:
-                //routertypesarr[i].type = atoi(token);
                 strcpy(routertypesarr[i].type,token);
                 break;
             case 3:
@@ -123,15 +111,12 @@ bool readRouterType(routerType *routertypesarr)
             token = strtok(NULL,",");
            j++;
         }  while (token != NULL);
-        //printf("switch slut\n\n\n\n");
         i++;
     }
-    
-
+    //Close file, no longer needed
     fclose(frtp);
     return true;
     }
-
 
 //Prints all elements in routertype routertype
 void printRouterTypeElements(routerType routerType) 
@@ -150,34 +135,25 @@ void printRouterTypeElements(routerType routerType)
 }
 
 /**
- * 
- * 
- *  
- *  
- * 
+ * Description: Reads trafficType.csv and outputs to trafficType struct
+ * Inputs: traffictypearray
+ * Output: trafficType *traffictypearray
  */
 bool readTrafficType(trafficType *traffictypearr)
 {
     /*
     should output to struct in following order:
-    id
-    type
-    latencySensitivity
-    dataSize
-    packetlossSensitivity
+    id(int)
+    type(string)[16]
+    latencySensitivity(int)
+    dataSize(int)
+    packetlossSensitivity(int)
     id,type,latencySensitivity,dataSize,packetLossSensitivity
-    All int
-    
-
-
-    Traffictypes:
-    Movie = 1
-    VoIP = 2
     */
-    char buffer[100];
+    char buffer[CSV_LINE_LEN];
     char *token;
     int i = 0;
-    int j = 1;
+    int j;
     //Opens trafficType.csv file
     FILE *fttp = fopen("config/trafficType.csv","r");
     //Checks that the file has been opened with success
@@ -186,24 +162,24 @@ bool readTrafficType(trafficType *traffictypearr)
         printf("Error in opening trafficType.csv \n");
         return false;
     }
-
+    // loops until eof is reached
     while (feof(fttp) != true)
     {
-        fgets(buffer,100,fttp);
+        fgets(buffer,CSV_LINE_LEN,fttp);
         j = 1;
+        // Splits buffer into smaller parts delimited by ","
         token = strtok(buffer,",");
         do
         {
-            printf("token: %s\n",token);
+            //printf("token: %s\n",token);
+            //Switches on which struct element should get token value
             switch (j)
             {
             case 1:
                 traffictypearr[i].id = atoi(token);
                 break;
             case 2:
-                //traffictypearr[i].type = atoi(token);
                 strcpy(traffictypearr[i].type, token);
-                //printf("\n%s\n",traffictypearr[i].type);
                 break;
             case 3:
                 traffictypearr[i].latency_sensitivity = atoi(token);
