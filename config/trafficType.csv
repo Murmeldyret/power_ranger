@@ -1,3 +1,2 @@
-id,type,latencySensitivity,dataSize,packetLossSensitivity;
-1,Movie,1000ms,50M,low;
-2,VoIP,50ms,1K,medium;
+1,Movie,1000ms,50MB,low,
+2,VoIP,50ms,1KB,medium,

@@ -7,33 +7,43 @@
 #define CSV_ROUTERTYPE_MAX_LEN 100
 #define CSV_ROUTERTYPE_NMBR_OF_PROPERTIES 9
 #define CSV_ROUTERTYPE_CHAR_LEN 10 //Max length of an element in routerType.csv excluding first line
-#define NMBR_OF_ROUTERTPES 1
+
 /**
  * Description: Initializes the data structure
  * Inputs: return parameters - pointer to the data structure
  * Output: struct routertype[], traffictype[]
  */
-bool initialise_data()
+bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
 {
-    readRouterType();
-    if (readRouterType == false)
+    bool routerType;
+    bool trafficType;
+    routerType = readRouterType(routertypearray);
+    //printRouterTypeElements(routertypearray[0]);
+    if (routerType == false)
     {
         printf("Error in readRouterType \n");
         return false;
     }
     
-    // readTrafficType();
+    trafficType = readTrafficType(traffictypearray);
+    if (trafficType == false)
+    {
+        printf("Error in readTrafficType \n");
+        return false;
+    }
+    
 
     return true;
 }
 
 /**
  * Description: Read router type from routertype.csv
- * Inputs: 
- * Output: 
+ * Inputs: routerType.csv
+ * Output: routerType array of router types
  */
-bool readRouterType()
+bool readRouterType(routerType *routertypesarr) 
 {
+    // TODO variabler herop
     FILE *frtp = fopen("config/routerType.csv", "r");
     /* RouterType.csv values are ordered in (seperated by commas) :   id(int), 
                                                 type(int), 
@@ -46,9 +56,9 @@ bool readRouterType()
                                                 packetMemory(int)
     id,type,bandwidth,wakeupTime,latency,powerIdle,powerPeak,powerSleep,packetMemory;
     */
-    if(!frtp)
+    if(frtp == NULL)
     {
-        printf("Problem reading routerType.csv \n");
+        printf("Error in opening routerType.csv \n");
         return false;
     }
 
@@ -57,7 +67,7 @@ bool readRouterType()
     
     char buffer[100]; 
     // TODO routerTypes array skal i main 
-    routerType routerTypes[NMBR_OF_ROUTERTPES];
+    //routerType routerTypes[NMBR_OF_ROUTERTYPES];
     char *token;
     int i = 0;
     int j = 1;
@@ -77,34 +87,35 @@ bool readRouterType()
             switch (j)
             {
             case 1:
-                routerTypes[i].id = atoi(token);
+                routertypesarr[i].id = atoi(token);
                 break;
             case 2:
-                routerTypes[i].type = atoi(token);
+                //routertypesarr[i].type = atoi(token);
+                strcpy(routertypesarr[i].type,token);
                 break;
             case 3:
-                routerTypes[i].bandwidth = atoi(token);
+                routertypesarr[i].bandwidth = atoi(token);
                 break;
             case 4:
-                routerTypes[i].wakeup_time = atoi(token);
+                routertypesarr[i].wakeup_time = atoi(token);
                 break;
             case 5:
-                routerTypes[i].latency = atoi(token);
+                routertypesarr[i].latency = atoi(token);
                 break;
             case 6:
-                routerTypes[i].power.idle = atoi(token);
+                routertypesarr[i].power.idle = atoi(token);
                 break;
             case 7:
-                routerTypes[i].power.peak = atoi(token);
+                routertypesarr[i].power.peak = atoi(token);
                 break;
             case 8:
-                routerTypes[i].power.sleep = atoi(token);
+                routertypesarr[i].power.sleep = atoi(token);
                 break;
             case 9:
-                routerTypes[i].packet_memory = atoi(token);
+                routertypesarr[i].packet_memory = atoi(token);
                 break;
             default:
-                printf("Expected number from 1-9 but got %d\n", j);
+                printf("Error in readRouterType Switch: Expected number from 1-9 but got %d\n", j);
                 return false;
                 break;
             }
@@ -115,15 +126,15 @@ bool readRouterType()
         i++;
     }
     
-    printRouterTypeElements(routerTypes[0]);
+
     fclose(frtp);
     return true;
     }
 
-//Prints all elements in struct routertype
+//Prints all elements in routertype routertype
 void printRouterTypeElements(routerType routerType) 
 {
-    printf("\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+    printf("\n%d\n%s\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
                             routerType.id,
                             routerType.type,
                             routerType.bandwidth,
@@ -133,8 +144,97 @@ void printRouterTypeElements(routerType routerType)
                             routerType.power.peak,
                             routerType.power.sleep,
                             routerType.packet_memory);
+    return;
 }
 
-bool readTrafficType()
+/**
+ * 
+ * 
+ *  
+ *  
+ * 
+ */
+bool readTrafficType(trafficType *traffictypearr)
 {
+    /*
+    should output to struct in following order:
+    id
+    type
+    latencySensitivity
+    dataSize
+    packetlossSensitivity
+    id,type,latencySensitivity,dataSize,packetLossSensitivity
+    All int
+
+    Traffictypes:
+    Movie = 1
+    VoIP = 2
+    */
+    char buffer[100];
+    char *token;
+    int i = 0;
+    int j = 1;
+    //Opens trafficType.csv file
+    FILE *fttp = fopen("config/trafficType.csv","r");
+    //Checks that the file has been opened with success
+    if(fttp == NULL)
+    {
+        printf("Error in opening trafficType.csv \n");
+        return false;
+    }
+
+    while (feof(fttp) != true)
+    {
+        fgets(buffer,100,fttp);
+        j = 1;
+        token = strtok(buffer,",");
+        do
+        {
+            printf("token: %s\n",token);
+            switch (j)
+            {
+            case 1:
+                traffictypearr[i].id = atoi(token);
+                break;
+            case 2:
+                //traffictypearr[i].type = atoi(token);
+                strcpy(traffictypearr[i].type, token);
+                //printf("\n%s\n",traffictypearr[i].type);
+                break;
+            case 3:
+                traffictypearr[i].latency_sensitivity = atoi(token);
+                break;
+            case 4:
+                traffictypearr[i].data_size = atoi(token);
+                break;
+            case 5:
+                //traffictypearr[i].packetloss_sensitivity = atoi(token);
+                strcpy(traffictypearr[i].packetloss_sensitivity,token);
+                break;
+            default:
+                printf("Error in readTrafficType Switch: Expected number from 1-5 but got %d\n",j);
+                return false;
+                break;
+            }
+            j++;
+            token = strtok(NULL,",");
+        } while (token != NULL && j <=5);
+        
+    i++;
+    }
+
+    fclose(fttp);
+    return true;
+}
+
+// prints all elements of a single trafficType
+void printTrafficTypeElements(trafficType trafficType)
+{
+    printf("\n%d\n%s\n%d\n%d\n%s\n",
+                            trafficType.id,
+                            trafficType.type,
+                            trafficType.latency_sensitivity,
+                            trafficType.data_size,
+                            trafficType.packetloss_sensitivity);
+    return;
 }

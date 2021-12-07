@@ -9,10 +9,14 @@
  */
 int main(void)
 {
+    routerType routertypes[NMBR_OF_ROUTERTYPES];
+    trafficType traffictypes[NMBR_OF_TRAFFICTYPES];
     printf("🗿ඞ\n");
     
-    initialise_data(); //TODO: Make this function
-    
+    initialise_data(routertypes, traffictypes); //TODO: Make this function
+    //prints structs of relevant type
+    //printRouterTypeElements(routertypes[0]);
+    //printTrafficTypeElements(traffictypes[1]);
     run_simulation();  //TODO: Make this function
 
     display_data();    //TODO: Make this function
