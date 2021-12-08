@@ -73,7 +73,7 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
     }
 
     // Initialise vector
-    igraph_vector_init(&weights, igraph_ecount(graph));
+    igraph_vector_init(&weights, igraph_vcount(graph));
 
 
     establish_connections(graph, routers, traffic, utilisation, &weights);
