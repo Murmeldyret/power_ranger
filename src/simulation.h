@@ -21,3 +21,10 @@ typedef struct simulationData
     int total_amount_of_data;
 } simulationData;
 
+typedef struct event
+{
+    int type;
+    int time; //Time of when it happens in seconds.
+    int router_id;
+    double data; // How much data should be transfered in MB.
+} event;
