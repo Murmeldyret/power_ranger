@@ -10,10 +10,9 @@
  * Output: None
  */
 
-void display_data()
+void display_data(simulationData data)
 {
     //! example simulation data only. Should not be present in final product
-    simulationData data;
 
     data.total_power_consumption = 1337;
     data.total_links = 2;
