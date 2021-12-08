@@ -94,8 +94,6 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
 void create_events(igraph_t *graph, trafficType *traffic, event *events)
 {
     int i;
-    //Print data_size of traffic
-    printf("%d\n", traffic->data_size);
 
     for (i = 0; i < EVENT_COUNT; i++)
     {
@@ -103,12 +101,6 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
         events[i].type = (rand() % NMBR_OF_TRAFFICTYPES);
         events[i].router_id = (rand() % igraph_vcount(graph));
         events[i].data = traffic[events[i].type].data_size;
-    }
-
-    // print events
-    for (i = 0; i < EVENT_COUNT; i++)
-    {
-        printf("Event %d: Time: %d, Type: %d, id: %d, data: %lf\n", i, events[i].time, events[i].type, events[i].router_id, events[i].data);
     }
 }
 
