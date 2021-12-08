@@ -37,9 +37,9 @@ void display_data()
     FILE *fp = fopen("outputs/Output.csv", "w");
 
     fprintf(fp, "This really be a bruh moment\n");
-    fprintf(fp, "Total power consumption: \n%d\n\n", data.total_power_consumption);
+    fprintf(fp, "Total power consumption: \n%d Watt(s)\n\n", data.total_power_consumption);
     fprintf(fp, "Amount of links: \n%d\n\n", data.total_links);
-    fprintf(fp, "Total amount of data: \n%d\n\n", data.total_amount_of_data);
+    fprintf(fp, "Total amount of data: \n%d Mb\n\n", data.total_amount_of_data);
 
     temp = path1;
     fprintf(fp, "Path followed:\n");
