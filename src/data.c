@@ -68,9 +68,11 @@ bool readRouterType(routerType *routertypesarr)
     {
         // Outputs current line to buffer char array
         fgets(buffer,CSV_LINE_LEN,frtp);
+        j = 1;
 
         // Splits buffer into smaller parts delimited by ","
         token = strtok(buffer,",");
+        printf("Token: %s\n", token);
         do
         {     
             //Switches on which struct elements should get token value
@@ -78,6 +80,7 @@ bool readRouterType(routerType *routertypesarr)
             {
             case 1:
                 routertypesarr[i].id = atoi(token);
+                printf("Token: %s\n", token);
                 break;
             case 2:
                 strcpy(routertypesarr[i].type,token);
@@ -109,14 +112,15 @@ bool readRouterType(routerType *routertypesarr)
                 break;
             }
             token = strtok(NULL,",");
-           j++;
-        }  while (token != NULL);
+            j++;
+        }  while (token != NULL && j <= 9);
         i++;
     }
     //Close file, no longer needed
     fclose(frtp);
+
     return true;
-    }
+}
 
 //Prints all elements in routertype routertype
 void printRouterTypeElements(routerType routerType) 
@@ -198,6 +202,7 @@ bool readTrafficType(trafficType *traffictypearr)
             }
             j++;
             token = strtok(NULL,",");
+
         } while (token != NULL && j <=5);
         
     i++;
