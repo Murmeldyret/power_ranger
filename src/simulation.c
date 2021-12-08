@@ -1,6 +1,10 @@
 #include "simulation.h"
 #include <time.h>
 
+#define EVENT_COUNT 100
+/* In seconds */
+#define SIMULATION_TIME 100
+
 /**
  * Description: Run simulation of network
  * Inputs: Validated data
@@ -74,6 +78,8 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
 
     // Initialise vector
     igraph_vector_init(&weights, igraph_vcount(graph));
+
+    // Create random events
 
 
     establish_connections(graph, routers, traffic, utilisation, &weights);
