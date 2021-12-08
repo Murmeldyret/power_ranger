@@ -99,7 +99,8 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
     {
         events[i].time = (rand() % SIMULATION_TIME) + 1;
         events[i].type = (rand() % NMBR_OF_TRAFFICTYPES);
-        events[i].router_id = (rand() % igraph_vcount(graph));
+        events[i].source_id = (rand() % igraph_vcount(graph));
+        events[i].destination_id = (rand() % igraph_vcount(graph));
         events[i].data = traffic[events[i].type].data_size;
     }
 }

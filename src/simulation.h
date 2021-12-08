@@ -25,6 +25,8 @@ typedef struct event
 {
     int type;
     int time; //Time of when it happens in seconds.
-    int router_id;
     double data; // How much data should be transfered in MB.
+    int source_id;
+    int destination_id;
+
 } event;
