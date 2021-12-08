@@ -59,21 +59,6 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph)
  */
 void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic)
 {
-
-    establish_connections(graph, routers, traffic);
-    send_data();
-}
-
-/**
- * Description: Connection between nodes and edges
- * Inputs:
- * Output:
- */
-void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic)
-{
-    // TODO: Move variables outside of the function.
-
-
     // Initialize variables
     double *utilisation;
     igraph_vector_t weights;
@@ -88,14 +73,25 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
     }
 
     // Initialise vector
-    igraph_vector_init(&weights, igraph_ecount(graph));
-    
+    igraph_vector_init(&weights, igraph_vcount(graph));
 
-    cal_link_weights(graph, routers, traffic, utilisation, &weights);
-    
+
+    establish_connections(graph, routers, traffic, utilisation, &weights);
+    send_data();
+
     /* Free memory */
     free(utilisation);
     igraph_vector_destroy(&weights);
+}
+
+/**
+ * Description: Connection between nodes and edges
+ * Inputs:
+ * Output:
+ */
+void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights)
+{
+    cal_link_weights(graph, routers, traffic, utilisation, weights);
 
 }
 
