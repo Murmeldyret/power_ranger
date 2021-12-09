@@ -1,8 +1,8 @@
 #include <stdbool.h>
 
 
-#define NMBR_OF_ROUTERTYPES 1 //number of routertypes from routerType.csv
-#define NMBR_OF_TRAFFICTYPES 2 // number of routertypes from trafficTypes.csv
+#define NMBR_OF_ROUTERTYPES 3 //number of routertypes from routerType.csv
+#define NMBR_OF_TRAFFICTYPES 4 // number of routertypes from trafficTypes.csv
 #define CSV_MAX_CHAR_LEN 16 // MAX length of struct element strings
 // Types, prototypes and functions (in order :))
 
