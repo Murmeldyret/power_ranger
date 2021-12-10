@@ -13,12 +13,11 @@
 void display_data(simulationData data)
 {
     //! example simulation data only. Should not be present in final product
-
     data.total_power_consumption = 1337;
     data.total_links = 2;
     data.total_amount_of_data = 123456789;
-    chain *path1, *path2, *path3, *path4, *temp;
 
+    chain *path1, *path2, *path3, *path4, *temp;
     path1 = (chain *)malloc(sizeof(chain));
     path2 = (chain *)malloc(sizeof(chain));
     path3 = (chain *)malloc(sizeof(chain));
