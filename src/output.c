@@ -1,8 +1,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "output.h"
 #include "simulation.h"
+#include "output.h"
+
 /**
  * Function: display_data
  * Description: Display data
@@ -10,38 +11,32 @@
  * Output: None
  */
 
-void display_data(simulationData data)
+void display_data(simulationData *data)
 {
-    //! example simulation data only. Should not be present in final product
-    data.total_power_consumption = 1337;
-    data.total_links = 2;
-    data.total_amount_of_data = 123456789;
-
-    chain *path1, *path2, *path3, *path4, *temp;
-    path1 = (chain *)malloc(sizeof(chain));
-    path2 = (chain *)malloc(sizeof(chain));
-    path3 = (chain *)malloc(sizeof(chain));
-    path4 = (chain *)malloc(sizeof(chain));
-
-    path1->data = 0;
-    path2->data = 1;
-    path3->data = 2;
-    path4->data = 3;
-    path1->next = path2;
-    path2->next = path3;
-    path3->next = path4;
-
+    /* Initialize variables */
+    chain *temp;
+    data->path_ptr = data->current_path;
 
     FILE *fp = fopen("outputs/Output.csv", "w");
 
-    fprintf(fp, "This really be a bruh moment\n");
-    fprintf(fp, "Total power consumption: \n%d Watt(s)\n\n", data.total_power_consumption);
-    fprintf(fp, "Amount of links: \n%d\n\n", data.total_links);
-    fprintf(fp, "Total amount of data: \n%d Mb\n\n", data.total_amount_of_data);
+    if (data != NULL)
+    {
+        printf("initializing data\n");
+        temp = data->path_ptr;
+    }
+    else
+    {
+        printf("Unable to get data\n");
+        return;
+    }
 
-    temp = path1;
+    fprintf(fp, "This really be a bruh moment\n");
+    fprintf(fp, "Total power consumption: \n%d Watt(s)\n\n", data->total_power_consumption);
+    fprintf(fp, "Amount of links: \n%d\n\n", data->total_links);
+    fprintf(fp, "Total amount of data: \n%d Mb\n\n", data->total_amount_of_data);
+
     fprintf(fp, "Path followed:\n");
-    do
+    while (temp)
     {
         fprintf(fp, "%d", temp->data);
         if (temp->next != NULL)
@@ -49,6 +44,7 @@ void display_data(simulationData data)
             fprintf(fp, " -> ");
         }
         temp = temp->next;
-    } while (temp != NULL);
+    }
+
     fprintf(fp, "\n");
 }
