@@ -63,32 +63,22 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph)
 void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic)
 {
     // Initialize variables
-    double *utilisation;
+
     event *events;
-    igraph_vector_t weights;
 
     // Initialise router utilisation array
-    utilisation = malloc(sizeof(double) * igraph_vcount(graph));
+
     events = malloc(sizeof(event) * EVENT_COUNT);
 
-    // Set utilisation to 0
-    for (int i = 0; i < igraph_vcount(graph); i++)
-    {
-        utilisation[i] = 0;
-    }
+    
 
-    // Initialise vector
-    igraph_vector_init(&weights, igraph_vcount(graph));
+    
 
     // Create random events
     create_events(graph, traffic, events);
 
-    establish_connections(graph, routers, traffic, utilisation, &weights);
-    send_data();
-
-    /* Free memory */
-    free(utilisation);
-    igraph_vector_destroy(&weights);
+    // Run simulation
+    send_data(graph, routers, traffic);
 }
 
 void create_events(igraph_t *graph, trafficType *traffic, event *events)
@@ -120,6 +110,25 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
  * Inputs:
  * Output:
  */
-void send_data()
+void send_data(igraph_t *graph, routerType *routers, trafficType *traffic)
 {
+    double *utilisation;
+    igraph_vector_t weights;
+    utilisation = malloc(sizeof(double) * igraph_vcount(graph));
+
+    // Initialise vector
+    igraph_vector_init(&weights, igraph_vcount(graph));
+
+    // Set utilisation to 0
+    for (int i = 0; i < igraph_vcount(graph); i++)
+    {
+        utilisation[i] = 0;
+    }
+
+    // ! For later use!
+    establish_connections(graph, routers, traffic, utilisation, &weights);
+
+    /* Free memory */
+    free(utilisation);
+    igraph_vector_destroy(&weights);
 }
