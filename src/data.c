@@ -64,7 +64,7 @@ bool readRouterType(routerType *routertypesarr)
         return false;
     }
     // loops until eof is reached
-    while (feof(frtp) != true)
+    while (feof(frtp) == false)
     {
         // Outputs current line to buffer char array
         fgets(buffer,CSV_LINE_LEN,frtp);
@@ -163,7 +163,7 @@ bool readTrafficType(trafficType *traffictypearr)
         return false;
     }
     // loops until eof is reached
-    while (feof(fttp) != true)
+    while (feof(fttp) == false)
     {
         fgets(buffer,CSV_LINE_LEN,fttp);
         j = 1;
