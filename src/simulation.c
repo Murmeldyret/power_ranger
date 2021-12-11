@@ -125,7 +125,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic)
         utilisation[i] = 0;
     }
 
-    // ! For later use!
+    // ! Used when a new event is happening
     establish_connections(graph, routers, traffic, utilisation, &weights);
 
     /* Free memory */
