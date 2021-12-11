@@ -107,7 +107,7 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
 void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights, igraph_vector_t *vertices, int from, int to)
 {
     cal_link_weights(graph, routers, traffic, utilisation, weights);
-    bellman_ford(graph, vertices, from, to, weights);
+    //bellman_ford(graph, vertices, from, to, weights);
     
 }
 
