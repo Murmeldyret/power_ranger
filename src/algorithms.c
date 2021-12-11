@@ -8,8 +8,15 @@
  * Inputs: graph, source node
  * Output: distance, predecessor
  */
-void bellman_ford()
+void bellman_ford(igraph_t *graph, igraph_vector_t *vertices, igraph_integer_t from, igraph_integer_t to, igraph_vector_t *weights)
 {
+    igraph_get_shortest_path_bellman_ford(graph,
+                                          vertices,
+                                          NULL,
+                                          from,
+                                          to,
+                                          weights,
+                                          IGRAPH_ALL);
 }
 
 /**
@@ -20,7 +27,7 @@ void bellman_ford()
  */
 void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights)
 {
-    
+
     for (int i = 0; i < igraph_vcount(graph); i++)
     {
         if (utilisation[i] < 80)
@@ -37,7 +44,6 @@ void cal_link_weights(igraph_t *graph, struct routerType *routers, struct traffi
         }
     }
 }
-
 
 /**
  * Function: f

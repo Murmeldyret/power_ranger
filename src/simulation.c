@@ -78,7 +78,11 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
     create_events(graph, traffic, events);
 
     // Run simulation
-    send_data(graph, routers, traffic);
+    send_data(graph, routers, traffic, events);
+
+
+    /* Free memory */
+    free(events);
 }
 
 void create_events(igraph_t *graph, trafficType *traffic, event *events)
@@ -100,9 +104,11 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
  * Inputs:
  * Output:
  */
-void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights)
+void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights, igraph_vector_t *vertices, int from, int to)
 {
     cal_link_weights(graph, routers, traffic, utilisation, weights);
+    bellman_ford(graph, vertices, from, to, weights);
+    
 }
 
 /**
@@ -110,10 +116,11 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
  * Inputs:
  * Output:
  */
-void send_data(igraph_t *graph, routerType *routers, trafficType *traffic)
+void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events)
 {
     double *utilisation;
     igraph_vector_t weights;
+    igraph_vector_t vertices;
     utilisation = malloc(sizeof(double) * igraph_vcount(graph));
 
     // Initialise vector
@@ -125,8 +132,11 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic)
         utilisation[i] = 0;
     }
 
+    /* loop while there are events */
+
+
     // ! Used when a new event is happening
-    establish_connections(graph, routers, traffic, utilisation, &weights);
+    establish_connections(graph, routers, traffic, utilisation, &weights, &vertices, events[0].source_id, events[0].destination_id);
 
     /* Free memory */
     free(utilisation);
