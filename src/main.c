@@ -23,8 +23,6 @@ int main(void)
 
     display_data();    //TODO: Make this function
 
-    // Test
-
     
     return 0;
 }

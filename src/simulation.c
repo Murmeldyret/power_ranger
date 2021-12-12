@@ -51,8 +51,6 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph)
                          /* directed= */ IGRAPH_DIRECTED,
                          /* algo=     */ IGRAPH_BARABASI_PSUMTREE,
                          /* start_from= */ 0);
-
-    printf("Graph created\n");
 }
 
 /**
@@ -115,6 +113,7 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
  */
 void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events)
 {
+    /* Initialize variables */
     double *utilisation;
     igraph_vector_t weights;
     igraph_vector_t vertices;
@@ -135,13 +134,6 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
 
     // ! Used when a new event is happening
     establish_connections(graph, routers, traffic, utilisation, &weights, &vertices, events[0].source_id, events[0].destination_id);
-
-    printf("Source id: %d Destination id: %d\n", events[0].source_id, events[0].destination_id);
-    /* Print all vertices */
-    for (int i = 0; i < igraph_vector_size(&vertices); i++)
-    {
-        printf("%d\n", (int)VECTOR(vertices)[i]);
-    }
     
     /* Free memory */
     free(utilisation);

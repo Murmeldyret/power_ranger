@@ -8,9 +8,7 @@
  * Output: distance, predecessor
  */
 void bellman_ford(igraph_t *graph, igraph_vector_t *vertices, igraph_vector_t *edges, igraph_integer_t from, igraph_integer_t to, igraph_vector_t *weights)
-{
-    printf("Bellman-Ford algorithm\n");
-    
+{    
     igraph_get_shortest_path_bellman_ford(graph,
                                           vertices,
                                           edges,
@@ -55,8 +53,6 @@ void cal_link_weights(igraph_t *graph, struct routerType *routers, struct traffi
         }
     }
 
-    printf("%d\n", VECTOR(*edges)[0]);
-
     j = 0;
 
     /* Calculate the weight of each link */
@@ -66,14 +62,6 @@ void cal_link_weights(igraph_t *graph, struct routerType *routers, struct traffi
         igraph_vector_set(weights, i, igraph_vector_e(&router_weights, igraph_vector_e(edges, j)) + igraph_vector_e(&router_weights, igraph_vector_e(edges, j + 1)));
         j += 2;
     }
-
-    /* Print all weights */
-    for (i = 0; i < igraph_ecount(graph); i++)
-    {
-        printf("%f\n", VECTOR(*weights)[i]);
-    }
-    /* Print lenght of weights vector */
-    printf("%d\n", igraph_vector_size(weights));
 }
 
 /**
