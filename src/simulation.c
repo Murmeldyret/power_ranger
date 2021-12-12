@@ -117,12 +117,14 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
     double *utilisation;
     igraph_vector_t weights;
     igraph_vector_t vertices;
+    bool ongoing_events = true;
+    int clock = 0; /* In milliseconds */
+
     utilisation = malloc(sizeof(double) * igraph_vcount(graph));
 
     // Initialise vector
     igraph_vector_init(&weights, igraph_ecount(graph));
     igraph_vector_init(&vertices, 0);
-
 
     // Set utilisation to 0
     for (int i = 0; i < igraph_vcount(graph); i++)
@@ -130,14 +132,26 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         utilisation[i] = 0;
     }
 
-    /* loop while there are events */
+    /* Run simulation and loop while there are ongoing events */
+    while (clock < SIMULATION_TIME * 1000 && ongoing_events)
+    {
+        /* Check if there are any events */
+        for (int i = 0; i < EVENT_COUNT; i++)
+        {
+            if (events[i].time * 1000 == clock)
+            {
+                // Establish connections
+                establish_connections(graph, routers, traffic, utilisation, &weights, &vertices, events[i].source_id, events[i].destination_id);
+                ongoing_events = true;
+            }
+        }
 
-    // ! Used when a new event is happening
-    establish_connections(graph, routers, traffic, utilisation, &weights, &vertices, events[0].source_id, events[0].destination_id);
-    
+        /* Move clock forward */
+        clock++;
+    }
+
     /* Free memory */
     free(utilisation);
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&vertices);
-    
 }
