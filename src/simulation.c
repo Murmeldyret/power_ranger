@@ -70,16 +70,11 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
 
     events = malloc(sizeof(event) * EVENT_COUNT);
 
-    
-
-    
-
     // Create random events
     create_events(graph, traffic, events);
 
     // Run simulation
     send_data(graph, routers, traffic, events);
-
 
     /* Free memory */
     free(events);
@@ -106,9 +101,11 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
  */
 void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights, igraph_vector_t *vertices, int from, int to)
 {
-    cal_link_weights(graph, routers, traffic, utilisation, weights);
-    //bellman_ford(graph, vertices, from, to, weights);
-    
+    igraph_vector_t edges;
+    igraph_vector_init(&edges, igraph_ecount(graph));
+
+    cal_link_weights(graph, routers, traffic, utilisation, &edges, weights);
+    bellman_ford(graph, vertices, &edges, from, to, weights);
 }
 
 /**
@@ -125,6 +122,8 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
 
     // Initialise vector
     igraph_vector_init(&weights, igraph_ecount(graph));
+    igraph_vector_init(&vertices, 0);
+
 
     // Set utilisation to 0
     for (int i = 0; i < igraph_vcount(graph); i++)
@@ -134,11 +133,19 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
 
     /* loop while there are events */
 
-
     // ! Used when a new event is happening
     establish_connections(graph, routers, traffic, utilisation, &weights, &vertices, events[0].source_id, events[0].destination_id);
 
+    printf("Source id: %d Destination id: %d\n", events[0].source_id, events[0].destination_id);
+    /* Print all vertices */
+    for (int i = 0; i < igraph_vector_size(&vertices); i++)
+    {
+        printf("%d\n", (int)VECTOR(vertices)[i]);
+    }
+    
     /* Free memory */
     free(utilisation);
     igraph_vector_destroy(&weights);
+    igraph_vector_destroy(&vertices);
+    
 }

@@ -8,6 +8,7 @@
  */
 int main(void)
 {
+    srand(time(NULL));
     routerType routertypes[NMBR_OF_ROUTERTYPES];
     trafficType traffictypes[NMBR_OF_TRAFFICTYPES];
     printf("🗿ඞ\n");
