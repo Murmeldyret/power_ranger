@@ -8,6 +8,7 @@
  */
 int main(void)
 {
+    srand(time(NULL));
     routerType routertypes[NMBR_OF_ROUTERTYPES];
     trafficType traffictypes[NMBR_OF_TRAFFICTYPES];
     printf("🗿ඞ\n");
@@ -21,8 +22,6 @@ int main(void)
     run_simulation(routertypes, traffictypes);  //TODO: Make this function
 
     display_data();    //TODO: Make this function
-
-    // Test
 
     
     return 0;
