@@ -124,7 +124,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
     utilisation = malloc(sizeof(double) * igraph_vcount(graph));
 
     // Initialise vector
-    igraph_vector_init(&weights, igraph_vcount(graph));
+    igraph_vector_init(&weights, igraph_ecount(graph));
 
     // Set utilisation to 0
     for (int i = 0; i < igraph_vcount(graph); i++)
