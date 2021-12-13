@@ -28,7 +28,7 @@ typedef struct router
 {
     int type;
     double utilization;
-};
+} router;
 
 
 void run_simulation(struct routerType *, struct trafficType *);
