@@ -24,6 +24,12 @@ typedef struct event
 
 } event;
 
+typedef struct router
+{
+    int type;
+    double utilization;
+};
+
 
 void run_simulation(struct routerType *, struct trafficType *);
 void populate_network(int, int, igraph_t *);
