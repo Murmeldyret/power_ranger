@@ -206,6 +206,7 @@ bool readTrafficType(trafficType *traffictypearr)
             j++;
             token = strtok(NULL,",");
 
+
         } while (token != NULL && j <=6);
         
     i++;

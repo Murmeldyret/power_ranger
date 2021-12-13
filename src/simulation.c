@@ -1,6 +1,10 @@
 #include "simulation.h"
 #include <time.h>
 
+#define EVENT_COUNT 100
+/* In seconds */
+#define SIMULATION_TIME 100
+
 /**
  * Description: Run simulation of network
  * Inputs: Validated data
@@ -17,7 +21,6 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic)
     edges = 3;
 
     // Initialize array of Router
-
     populate_network(nodes, edges, &graph);
     run_simulation_loop(&graph, routers, traffic);
 
@@ -48,8 +51,6 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph)
                          /* directed= */ IGRAPH_DIRECTED,
                          /* algo=     */ IGRAPH_BARABASI_PSUMTREE,
                          /* start_from= */ 0);
-
-    printf("Graph created\n");
 }
 
 /**
@@ -59,9 +60,36 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph)
  */
 void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic)
 {
+    // Initialize variables
 
-    establish_connections(graph, routers, traffic);
-    send_data();
+    event *events;
+
+    // Initialise router utilisation array
+
+    events = malloc(sizeof(event) * EVENT_COUNT);
+
+    // Create random events
+    create_events(graph, traffic, events);
+
+    // Run simulation
+    send_data(graph, routers, traffic, events);
+
+    /* Free memory */
+    free(events);
+}
+
+void create_events(igraph_t *graph, trafficType *traffic, event *events)
+{
+    int i;
+
+    for (i = 0; i < EVENT_COUNT; i++)
+    {
+        events[i].time = (rand() % SIMULATION_TIME) + 1;
+        events[i].type = (rand() % NMBR_OF_TRAFFICTYPES);
+        events[i].source_id = (rand() % igraph_vcount(graph));
+        events[i].destination_id = (rand() % igraph_vcount(graph));
+        events[i].data = traffic[events[i].type].data_size;
+    }
 }
 
 /**
@@ -69,34 +97,13 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
  * Inputs:
  * Output:
  */
-void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic)
+void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights, igraph_vector_t *vertices, int from, int to)
 {
-    // TODO: Move variables outside of the function.
+    igraph_vector_t edges;
+    igraph_vector_init(&edges, igraph_ecount(graph));
 
-
-    // Initialize variables
-    double *utilisation;
-    igraph_vector_t weights;
-    
-    // Initialise router utilisation array
-    utilisation = malloc(sizeof(double) * igraph_vcount(graph));
-
-    // Set utilisation to 0
-    for (int i = 0; i < igraph_vcount(graph); i++)
-    {
-        utilisation[i] = 0;
-    }
-
-    // Initialise vector
-    igraph_vector_init(&weights, igraph_ecount(graph));
-    
-
-    cal_link_weights(graph, routers, traffic, utilisation, &weights);
-    
-    /* Free memory */
-    free(utilisation);
-    igraph_vector_destroy(&weights);
-
+    cal_link_weights(graph, routers, traffic, utilisation, &edges, weights);
+    bellman_ford(graph, vertices, &edges, from, to, weights);
 }
 
 /**
@@ -104,6 +111,33 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
  * Inputs:
  * Output:
  */
-void send_data()
+void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events)
 {
+    /* Initialize variables */
+    double *utilisation;
+    igraph_vector_t weights;
+    igraph_vector_t vertices;
+    utilisation = malloc(sizeof(double) * igraph_vcount(graph));
+
+    // Initialise vector
+    igraph_vector_init(&weights, igraph_ecount(graph));
+    igraph_vector_init(&vertices, 0);
+
+
+    // Set utilisation to 0
+    for (int i = 0; i < igraph_vcount(graph); i++)
+    {
+        utilisation[i] = 0;
+    }
+
+    /* loop while there are events */
+
+    // ! Used when a new event is happening
+    establish_connections(graph, routers, traffic, utilisation, &weights, &vertices, events[0].source_id, events[0].destination_id);
+    
+    /* Free memory */
+    free(utilisation);
+    igraph_vector_destroy(&weights);
+    igraph_vector_destroy(&vertices);
+    
 }
