@@ -15,16 +15,6 @@ typedef struct simulationData
     int total_amount_of_data;
 } simulationData;
 
-typedef struct event
-{
-    int type;
-    int time; //Time of when it happens in seconds.
-    double data; // How much data should be transfered in MB.
-    int source_id;
-    int destination_id;
-
-} event;
-
 void run_simulation(struct routerType *, struct trafficType *);
 void populate_network(int, int, igraph_t *, router *);
 void create_events(igraph_t *, trafficType *, event *);

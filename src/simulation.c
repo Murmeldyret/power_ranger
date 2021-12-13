@@ -98,6 +98,7 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
         events[i].source_id = (rand() % igraph_vcount(graph));
         events[i].destination_id = (rand() % igraph_vcount(graph));
         events[i].data = traffic[events[i].type].data_size;
+        igraph_vector_init(&events[i].path, 0);
     }
 }
 
@@ -124,13 +125,12 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
 {
     /* Initialize variables */
     igraph_vector_t weights;
-    igraph_vector_t vertices;
     bool ongoing_events = true;
     int clock = 0; /* In milliseconds */
 
     // Initialise vector
     igraph_vector_init(&weights, igraph_ecount(graph));
-    igraph_vector_init(&vertices, 0);
+
 
     // Set utilisation to 0
     for (int i = 0; i < igraph_vcount(graph); i++)
@@ -147,7 +147,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
             if (events[i].time * 1000 == clock)
             {
                 // Establish connections
-                establish_connections(graph, routers, traffic, router_array, &weights, &vertices, events[i].source_id, events[i].destination_id);
+                establish_connections(graph, routers, traffic, router_array, &weights, &events[i].path, events[i].source_id, events[i].destination_id);
                 ongoing_events = true;
             }
         }
@@ -156,10 +156,6 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         clock++;
     }
 
-    // ! Used when a new event is happening
-    establish_connections(graph, routers, traffic, router_array, &weights, &vertices, events[0].source_id, events[0].destination_id);
-
     /* Free memory */
     igraph_vector_destroy(&weights);
-    igraph_vector_destroy(&vertices);
 }
