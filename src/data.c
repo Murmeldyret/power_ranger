@@ -68,9 +68,11 @@ bool readRouterType(routerType *routertypesarr)
     {
         // Outputs current line to buffer char array
         fgets(buffer,CSV_LINE_LEN,frtp);
+        j = 1;
 
         // Splits buffer into smaller parts delimited by ","
         token = strtok(buffer,",");
+        printf("Token: %s\n", token);
         do
         {     
             //Switches on which struct elements should get token value
@@ -78,6 +80,7 @@ bool readRouterType(routerType *routertypesarr)
             {
             case 1:
                 routertypesarr[i].id = atoi(token);
+                printf("Token: %s\n", token);
                 break;
             case 2:
                 strcpy(routertypesarr[i].type,token);
@@ -109,14 +112,15 @@ bool readRouterType(routerType *routertypesarr)
                 break;
             }
             token = strtok(NULL,",");
-           j++;
-        }  while (token != NULL);
+            j++;
+        }  while (token != NULL && j <= 9);
         i++;
     }
     //Close file, no longer needed
     fclose(frtp);
+
     return true;
-    }
+}
 
 //Prints all elements in routertype routertype
 void printRouterTypeElements(routerType routerType) 
@@ -188,17 +192,21 @@ bool readTrafficType(trafficType *traffictypearr)
                 traffictypearr[i].data_size = atoi(token);
                 break;
             case 5:
+                traffictypearr[i].speed = atoi(token);
+                break;
+            case 6:
                 //traffictypearr[i].packetloss_sensitivity = atoi(token);
                 strcpy(traffictypearr[i].packetloss_sensitivity,token);
                 break;
             default:
-                printf("Error in readTrafficType Switch: Expected number from 1-5 but got %d\n",j);
+                printf("Error in readTrafficType Switch: Expected number from 1-6 but got %d\n",j);
                 return false;
                 break;
             }
             j++;
             token = strtok(NULL,",");
-        } while (token != NULL && j <=5);
+
+        } while (token != NULL && j <=6);
         
     i++;
     }
@@ -210,11 +218,12 @@ bool readTrafficType(trafficType *traffictypearr)
 // prints all elements of a single trafficType
 void printTrafficTypeElements(trafficType trafficType)
 {
-    printf("\n%d\n%s\n%d\n%d\n%s\n",
+    printf("\n%d\n%s\n%d\n%d\n%d\n%s\n",
                             trafficType.id,
                             trafficType.type,
                             trafficType.latency_sensitivity,
                             trafficType.data_size,
+                            trafficType.speed,
                             trafficType.packetloss_sensitivity);
     return;
 }

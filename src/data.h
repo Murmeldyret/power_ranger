@@ -31,6 +31,7 @@ typedef struct trafficType
     char type[CSV_MAX_CHAR_LEN];
     int latency_sensitivity; //ms
     int data_size; //MB
+    int speed;
     char packetloss_sensitivity[CSV_MAX_CHAR_LEN]; 
 } trafficType;
 /* Function prototypes */
