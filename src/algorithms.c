@@ -25,7 +25,7 @@ void bellman_ford(igraph_t *graph, igraph_vector_t *vertices, igraph_vector_t *e
  * Inputs: graph, routerType, trafficType
  * Output: weight in vector
  */
-void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *edges, igraph_vector_t *weights)
+void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, router *router_array, igraph_vector_t *edges, igraph_vector_t *weights)
 {
     int i;
     int j;
@@ -39,17 +39,17 @@ void cal_link_weights(igraph_t *graph, struct routerType *routers, struct traffi
     /* Calculate the weight of each router */
     for (int i = 0; i < igraph_vcount(graph); i++)
     {
-        if (utilisation[i] < 80)
+        if (router_array[i].utilisation < 80)
         {
-            igraph_vector_set(&router_weights, i, f(utilisation[i]));
+            igraph_vector_set(&router_weights, i, f(router_array[i].utilisation));
         }
-        else if (utilisation[i] >= 80)
+        else if (router_array[i].utilisation >= 80)
         {
-            igraph_vector_set(&router_weights, i, g(utilisation[i]));
+            igraph_vector_set(&router_weights, i, g(router_array[i].utilisation));
         }
         else
         {
-            utilisation[i] = 0;
+            router_array[i].utilisation = 0;
         }
     }
 
@@ -62,6 +62,9 @@ void cal_link_weights(igraph_t *graph, struct routerType *routers, struct traffi
         igraph_vector_set(weights, i, igraph_vector_e(&router_weights, igraph_vector_e(edges, j)) + igraph_vector_e(&router_weights, igraph_vector_e(edges, j + 1)));
         j += 2;
     }
+
+
+    
 }
 
 /**
