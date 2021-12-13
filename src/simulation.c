@@ -20,8 +20,10 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic)
     nodes = 100;
     edges = 3;
 
+    router *routers_array = malloc(nodes * sizeof(struct routerType));
+
     // Initialize array of Router
-    populate_network(nodes, edges, &graph);
+    populate_network(nodes, edges, &graph, routers_array);
     run_simulation_loop(&graph, routers, traffic);
 
     // Free memory
@@ -33,7 +35,7 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic)
  * Inputs: Validated data
  * Output: struct graph
  */
-void populate_network(int nodes, int edges_per_node, igraph_t *graph)
+void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *routers)
 {
     // Initialize variables
     igraph_vector_t edges;
@@ -51,6 +53,12 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph)
                          /* directed= */ IGRAPH_DIRECTED,
                          /* algo=     */ IGRAPH_BARABASI_PSUMTREE,
                          /* start_from= */ 0);
+
+    /* Create random router types in array */
+    for (i = 0; i < nodes; i++)
+    {
+        routers[i].type = rand() % NMBR_OF_ROUTERTYPES;
+    }
 }
 
 /**
@@ -149,6 +157,9 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         /* Move clock forward */
         clock++;
     }
+
+    // ! Used when a new event is happening
+    establish_connections(graph, routers, traffic, utilisation, &weights, &vertices, events[0].source_id, events[0].destination_id);
 
     /* Free memory */
     free(utilisation);

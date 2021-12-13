@@ -192,18 +192,22 @@ bool readTrafficType(trafficType *traffictypearr)
                 traffictypearr[i].data_size = atoi(token);
                 break;
             case 5:
+                traffictypearr[i].speed = atoi(token);
+                break;
+            case 6:
                 //traffictypearr[i].packetloss_sensitivity = atoi(token);
                 strcpy(traffictypearr[i].packetloss_sensitivity,token);
                 break;
             default:
-                printf("Error in readTrafficType Switch: Expected number from 1-5 but got %d\n",j);
+                printf("Error in readTrafficType Switch: Expected number from 1-6 but got %d\n",j);
                 return false;
                 break;
             }
             j++;
             token = strtok(NULL,",");
 
-        } while (token != NULL && j <=5);
+
+        } while (token != NULL && j <=6);
         
     i++;
     }
@@ -215,11 +219,12 @@ bool readTrafficType(trafficType *traffictypearr)
 // prints all elements of a single trafficType
 void printTrafficTypeElements(trafficType trafficType)
 {
-    printf("\n%d\n%s\n%d\n%d\n%s\n",
+    printf("\n%d\n%s\n%d\n%d\n%d\n%s\n",
                             trafficType.id,
                             trafficType.type,
                             trafficType.latency_sensitivity,
                             trafficType.data_size,
+                            trafficType.speed,
                             trafficType.packetloss_sensitivity);
     return;
 }
