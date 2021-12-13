@@ -32,7 +32,7 @@ typedef struct router
 
 
 void run_simulation(struct routerType *, struct trafficType *);
-void populate_network(int, int, igraph_t *);
+void populate_network(int, int, igraph_t *, router *);
 void create_events(igraph_t *, trafficType *, event *);
 void run_simulation_loop(igraph_t *, struct routerType *, struct trafficType *);
 void establish_connections(igraph_t *, struct routerType *, struct trafficType *, double *, igraph_vector_t *, igraph_vector_t *, int, int);
