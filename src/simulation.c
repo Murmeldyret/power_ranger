@@ -131,7 +131,6 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
     // Initialise vector
     igraph_vector_init(&weights, igraph_ecount(graph));
 
-
     // Set utilisation to 0
     for (int i = 0; i < igraph_vcount(graph); i++)
     {
@@ -149,11 +148,20 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                 // Establish connections
                 establish_connections(graph, routers, traffic, router_array, &weights, &events[i].path, events[i].source_id, events[i].destination_id);
                 ongoing_events = true;
+
+                /* Add latency to event */
+                for (int j = 0; j < igraph_vector_size(&events[i].path); j++)
+                {
+                    events[i].latency += routers[router_array[(int)igraph_vector_e(&events[j].path, j)].type].latency;
+                    printf("Latency: %d\n", events[i].latency);
+                }
             }
         }
 
-        for (int i = 0; i < igraph_vector_size(&events->path); i++) {
-            if (routers[router_array[i].type].power.peak) {
+        for (int i = 0; i < igraph_vector_size(&events->path); i++)
+        {
+            if (routers[router_array[i].type].power.peak)
+            {
                 router_array[i].utilisation += 0;
             }
         }
@@ -161,7 +169,6 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         /* Move clock forward */
         clock++;
     }
-
 
     /* Free memory */
     igraph_vector_destroy(&weights);
