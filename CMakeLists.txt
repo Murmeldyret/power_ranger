@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 3.16)
 # Project name
 project(power_ranger)
 
-# Add json-c library
-find_package(json-c REQUIRED)
-
 # Add igraph library
 find_package(igraph REQUIRED)
 
