@@ -99,6 +99,7 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
         events[i].destination_id = (rand() % igraph_vcount(graph));
         events[i].data = traffic[events[i].type].data_size;
         igraph_vector_init(&events[i].path, 0);
+        events[i].latency = 0;
     }
 }
 
@@ -153,7 +154,6 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                 for (int j = 0; j < igraph_vector_size(&events[i].path); j++)
                 {
                     events[i].latency += routers[router_array[(int)igraph_vector_e(&events[j].path, j)].type].latency;
-                    printf("Latency: %d\n", events[i].latency);
                 }
             }
         }
