@@ -83,6 +83,7 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
             links_array[i].max_bandwidth = routers_types[routers[(int)igraph_vector_e(&edges, j + 1)].type].bandwidth;
         }
         links_array[i].remaining_bandwidth = links_array[i].max_bandwidth;
+        links_array[i].utilisation = 0;
         j += 2;
     }
 
