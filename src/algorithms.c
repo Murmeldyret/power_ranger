@@ -54,14 +54,6 @@ void cal_link_weights(igraph_t *graph, struct routerType *routers, struct traffi
             links_array[i].utilisation = 0;
         }
     }
-
-    printf("Hello\n");
-
-    /* Print all the weights */
-    for (i = 0; i < igraph_ecount(graph); i++)
-    {
-        printf("Link util: %lf: %lf\n", links_array[i].utilisation, igraph_vector_e(weights, i));
-    }
     
 }
 
