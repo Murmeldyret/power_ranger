@@ -12,7 +12,7 @@ typedef struct link
 {
     int max_bandwidth;
     int remaining_bandwidth;
-    int utilisation;
+    double utilisation;
 } link;
 
 typedef struct event

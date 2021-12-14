@@ -21,16 +21,17 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic)
     edges = 3;
 
     router *routers_array = malloc(nodes * sizeof(struct router));
-    link *links_array = malloc(edges * sizeof(struct link));
-    
+    link *links_array = malloc(0 * sizeof(struct link));
 
     // Initialize array of Router
-    populate_network(nodes, edges, &graph, routers_array);
+    populate_network(nodes, edges, &graph, routers_array, links_array, routers);
+
     run_simulation_loop(&graph, routers, traffic, routers_array);
 
     // Free memory
     igraph_destroy(&graph);
     free(routers_array);
+    free(links_array);
 }
 
 /**
@@ -38,7 +39,7 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic)
  * Inputs: Validated data
  * Output: struct graph
  */
-void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *routers)
+void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *routers, link *links_array, routerType *routers_types)
 {
     // Initialize variables
     igraph_vector_t edges;
@@ -63,7 +64,33 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
         routers[i].type = rand() % NMBR_OF_ROUTERTYPES;
     }
 
-    
+    igraph_vector_init(&edges, 0);
+    igraph_get_edgelist(graph, &edges, false);
+
+    /* Populate links array */
+    links_array = (link *)realloc(links_array, igraph_ecount(graph) * sizeof(struct link));
+
+    /* Initialize links array */
+    j = 0;
+    for (i = 0; i < igraph_ecount(graph); i++)
+    {
+        if (routers_types[routers[(int)igraph_vector_e(&edges, j)].type].bandwidth < routers_types[routers[(int)igraph_vector_e(&edges, j + 1)].type].bandwidth)
+        {
+            links_array[i].max_bandwidth = routers_types[routers[(int)igraph_vector_e(&edges, j)].type].bandwidth;
+        }
+        else
+        {
+            links_array[i].max_bandwidth = routers_types[routers[(int)igraph_vector_e(&edges, j + 1)].type].bandwidth;
+        }
+        links_array[i].remaining_bandwidth = links_array[i].max_bandwidth;
+        j += 2;
+    }
+
+    /* Print links array bandwidths */
+    for (i = 0; i < igraph_ecount(graph); i++)
+    {
+        printf("Link %d: %d\n", i, links_array[i].max_bandwidth);
+    }
 }
 
 /**
