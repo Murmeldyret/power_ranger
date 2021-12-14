@@ -98,6 +98,7 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
         events[i].source_id = (rand() % igraph_vcount(graph));
         events[i].destination_id = (rand() % igraph_vcount(graph));
         events[i].data = traffic[events[i].type].data_size;
+        events[i].bandwidth = traffic[events[i].type].speed;
         igraph_vector_init(&events[i].path, 0);
         events[i].latency = 0;
     }

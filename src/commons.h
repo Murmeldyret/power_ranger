@@ -8,14 +8,23 @@ typedef struct router
     bool sleeping;
 } router;
 
+typedef struct link
+{
+    int max_bandwidth;
+    int remaining_bandwidth;
+    int utilisation;
+} link;
+
 typedef struct event
 {
     int type;
     int time; //Time of when it happens in seconds.
     int latency; //Latency of the event in seconds.
     double data; // How much data should be transfered in MB.
+    int bandwidth; //Bandwidth of the event in Mbps.
     int source_id;
     int destination_id;
     igraph_vector_t path;
 
 } event;
+
