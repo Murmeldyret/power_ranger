@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="https://static.wikia.nocookie.net/logopedia/images/7/71/MMPR_Era_Logo.png" alt="Smiley face" width="40%" height="40%">
+  <img src="https://i.imgur.com/71sUCm6.png" alt="Smiley face" width="40%" height="40%">
 </p>
 
 
-# Power_ranger
+# Power ranger
 
 Power optimisation for computer networks that will optimize and make the internet more energy efficient. 
 
