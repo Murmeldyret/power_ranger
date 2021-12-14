@@ -18,7 +18,7 @@ typedef struct simulationData
 void run_simulation(struct routerType *, struct trafficType *);
 void populate_network(int, int, igraph_t *, router *, link *, routerType *);
 void create_events(igraph_t *, trafficType *, event *);
-void run_simulation_loop(igraph_t *, struct routerType *, struct trafficType *, router *);
-void establish_connections(igraph_t *, struct routerType *, struct trafficType *, router *, igraph_vector_t *, igraph_vector_t *, int, int);
-void send_data(igraph_t *, struct routerType *, struct trafficType *, event *, router *);
+void run_simulation_loop(igraph_t *, struct routerType *, struct trafficType *, router *, link *);
+void establish_connections(igraph_t *, struct routerType *, struct trafficType *, link *, igraph_vector_t *, igraph_vector_t *, int, int);
+void send_data(igraph_t *, struct routerType *, struct trafficType *, event *, router *, link *);
 

@@ -27,7 +27,7 @@ void bellman_ford(igraph_t *graph, igraph_vector_t *vertices, igraph_vector_t *e
  * Inputs: graph, routerType, trafficType
  * Output: weight in vector
  */
-void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, router *router_array, igraph_vector_t *edges, igraph_vector_t *weights)
+void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, link *links_array, igraph_vector_t *edges, igraph_vector_t *weights)
 {
     int i;
     int j;
@@ -39,33 +39,29 @@ void cal_link_weights(igraph_t *graph, struct routerType *routers, struct traffi
     igraph_get_edgelist(graph, edges, false);
 
     /* Calculate the weight of each router */
-    for (int i = 0; i < igraph_vcount(graph); i++)
+    for (int i = 0; i < igraph_ecount(graph); i++)
     {
-        if (router_array[i].utilisation < 80)
+        if (links_array[i].utilisation < 80)
         {
-            igraph_vector_set(&router_weights, i, f(router_array[i].utilisation));
+            igraph_vector_set(weights, i, f(links_array[i].utilisation));
         }
-        else if (router_array[i].utilisation >= 80)
+        else if (links_array[i].utilisation >= 80)
         {
-            igraph_vector_set(&router_weights, i, g(router_array[i].utilisation));
+            igraph_vector_set(weights, i, g(links_array[i].utilisation));
         }
         else
         {
-            router_array[i].utilisation = 0;
+            links_array[i].utilisation = 0;
         }
     }
 
-    j = 0;
+    printf("Hello\n");
 
-    /* Calculate the weight of each link */
+    /* Print all the weights */
     for (i = 0; i < igraph_ecount(graph); i++)
     {
-        /* Add weight of each router to the total weight */
-        igraph_vector_set(weights, i, igraph_vector_e(&router_weights, igraph_vector_e(edges, j)) + igraph_vector_e(&router_weights, igraph_vector_e(edges, j + 1)));
-        j += 2;
+        printf("Link util: %lf: %lf\n", links_array[i].utilisation, igraph_vector_e(weights, i));
     }
-
-
     
 }
 
