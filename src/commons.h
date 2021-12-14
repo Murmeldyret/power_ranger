@@ -25,6 +25,7 @@ typedef struct event
     int source_id;
     int destination_id;
     igraph_vector_t path;
+    igraph_vector_t path_edges;
 
 } event;
 

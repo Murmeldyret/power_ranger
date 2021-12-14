@@ -20,7 +20,9 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic)
     nodes = 100;
     edges = 3;
 
-    router *routers_array = malloc(nodes * sizeof(struct routerType));
+    router *routers_array = malloc(nodes * sizeof(struct router));
+    link *links_array = malloc(edges * sizeof(struct link));
+    
 
     // Initialize array of Router
     populate_network(nodes, edges, &graph, routers_array);
@@ -60,6 +62,8 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
     {
         routers[i].type = rand() % NMBR_OF_ROUTERTYPES;
     }
+
+    
 }
 
 /**

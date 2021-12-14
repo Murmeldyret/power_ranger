@@ -16,6 +16,8 @@ void bellman_ford(igraph_t *graph, igraph_vector_t *vertices, igraph_vector_t *e
                                           to,
                                           weights,
                                           IGRAPH_ALL);
+
+    
     
 }
 
