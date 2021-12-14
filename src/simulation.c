@@ -152,9 +152,16 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
             }
         }
 
+        for (int i = 0; i < igraph_vector_size(&events->path); i++) {
+            if (routers[router_array[i].type].power.peak) {
+                router_array[i].utilisation += 0;
+            }
+        }
+
         /* Move clock forward */
         clock++;
     }
+
 
     /* Free memory */
     igraph_vector_destroy(&weights);
