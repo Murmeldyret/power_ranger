@@ -1,7 +1,7 @@
 #include "simulation.h"
 #include <time.h>
 
-#define EVENT_COUNT 10000
+#define EVENT_COUNT 100
 /* In seconds */
 #define SIMULATION_TIME 100
 
@@ -195,7 +195,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
 
                 // ! Calculate available bandwidth for the links affected by the new connection.
 
-                bandwidth_balancer(&events[i].path_edges, links_array, events);
+                bandwidth_balancer(i, &events[i].path_edges, links_array, events);
             }
         }
 
@@ -236,7 +236,7 @@ void add_event_to_links(int event_id, igraph_vector_t *path_edges, link *links_a
     }
 }
 
-void bandwidth_balancer(igraph_vector_t *path_edges, link *links_array, event *event)
+void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_array, event *event)
 {
     int sum_bandwidth = 0;
     igraph_vector_t link_overload;
@@ -265,7 +265,37 @@ void bandwidth_balancer(igraph_vector_t *path_edges, link *links_array, event *e
         /* Sort overloaded links by least remaining bandwidth */
         sort_links(links_array, &link_overload);
 
-        
+        /* Balance bandwidth for each link */
+        for (int i = 0; i < igraph_vector_size(&link_overload); i++)
+        {
+            /* initialise variables */
+            double *bandwidth_percentage = (double *)malloc(sizeof(double) * igraph_vector_size(&links_array[(int)igraph_vector_e(&link_overload, i)].events));
+
+            /* Calculate bandwidth percentage */
+            for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(&link_overload, i)].events); j++)
+            {
+                bandwidth_percentage[j] = (double)event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth / (double)links_array[(int)igraph_vector_e(&link_overload, i)].max_bandwidth;
+            }
+
+            /* Apply bandwidth percentage to each event */
+            for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(&link_overload, i)].events); j++)
+            {
+                event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth = (int)(bandwidth_percentage[j] * event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth);
+            }
+        }
+    }
+
+    /* Subtract bandwidth from links that are not overloaded */
+    for (int i = 0; i < igraph_vector_size(path_edges); i++)
+    {
+        if (igraph_vector_contains(&link_overload, (int)igraph_vector_e(path_edges, i)))
+        {
+            continue;
+        }
+        else
+        {
+            links_array[(int)igraph_vector_e(path_edges, i)].remaining_bandwidth -= event[event_id].available_bandwidth;
+        }
     }
 
     /* Free memory */
