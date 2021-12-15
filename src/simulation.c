@@ -1,7 +1,7 @@
 #include "simulation.h"
 #include <time.h>
 
-#define EVENT_COUNT 100
+#define EVENT_COUNT 10000
 /* In seconds */
 #define SIMULATION_TIME 100
 
@@ -194,10 +194,8 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                 }
 
                 // ! Calculate available bandwidth for the links affected by the new connection.
-                for (int j = 0; j < igraph_vector_size(&events[i].path_edges); j++)
-                {
-                    bandwidth_balancer(&events[i].path_edges, links_array, events);
-                }
+
+                bandwidth_balancer(&events[i].path_edges, links_array, events);
             }
         }
 
@@ -240,30 +238,50 @@ void add_event_to_links(int event_id, igraph_vector_t *path_edges, link *links_a
 
 void bandwidth_balancer(igraph_vector_t *path_edges, link *links_array, event *event)
 {
-    printf("Size of events: %d\n", igraph_vector_size(&links_array[(int)igraph_vector_e(path_edges, 0)].events));
-    /* Iterate through all edges in the path */
+    int sum_bandwidth = 0;
+    igraph_vector_t link_overload;
+
+    igraph_vector_init(&link_overload, 0);
+
+    /* Check if there is enough bandwidth on each link */
     for (int i = 0; i < igraph_vector_size(path_edges); i++)
     {
-        int bandwidth_util = 0;
-        double *bandwidth_percentage = (double *)malloc(sizeof(double) * igraph_vector_size(&links_array[(int)igraph_vector_e(path_edges, i)].events));
-
-        /* Add bandwidth for all events in the path */
+        /* Sum available bandwidth in every event */
         for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(path_edges, i)].events); j++)
         {
-            bandwidth_util += event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(path_edges, i)].events, j)].bandwidth;
-            bandwidth_percentage[j] = links_array[(int)igraph_vector_e(path_edges, i)].max_bandwidth / event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(path_edges, i)].events, j)].bandwidth;
+            sum_bandwidth += event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(path_edges, i)].events, j)].available_bandwidth;
         }
 
-        /* Calculate available bandwidth per event*/
-        for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(path_edges, i)].events); j++)
+        /* Check if there is enough bandwidth */
+        if (sum_bandwidth > links_array[(int)igraph_vector_e(path_edges, i)].max_bandwidth)
         {
-            event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(path_edges, i)].events, j)].available_bandwidth = links_array[(int)igraph_vector_e(path_edges, i)].max_bandwidth * bandwidth_percentage[j];
-
-            /* Print bandwidth */
-            printf("%d\n", event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(path_edges, i)].events, j)].available_bandwidth);
+            igraph_vector_push_back(&link_overload, (int)igraph_vector_e(path_edges, i));
         }
-
-        /* Free memory */
-        free(bandwidth_percentage);
     }
+
+    /* Run if links are overloaded */
+    if (igraph_vector_size(&link_overload) > 0)
+    {
+        /* Sort overloaded links by least remaining bandwidth */
+        int temp;
+        for (int i = 0; i < igraph_vector_size(&link_overload); i++)
+        {
+            for (int j = 0; j < igraph_vector_size(&link_overload) - 1; j++)
+            {
+                if (links_array[(int)igraph_vector_e(&link_overload, j)].remaining_bandwidth > links_array[(int)igraph_vector_e(&link_overload, j + 1)].remaining_bandwidth)
+                {
+                    temp = (int)igraph_vector_e(&link_overload, j);
+                    VECTOR(link_overload)
+                    [j] = (int)igraph_vector_e(&link_overload, j + 1);
+                    VECTOR(link_overload)
+                    [j + 1] = temp;
+                }
+            }
+        }
+        
+    }
+
+    /* Free memory */
+    igraph_vector_destroy(&link_overload);
 }
+
