@@ -54,7 +54,6 @@ void cal_link_weights(igraph_t *graph, struct routerType *routers, struct traffi
             links_array[i].utilisation = 0;
         }
     }
-    
 }
 
 /**

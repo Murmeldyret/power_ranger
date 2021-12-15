@@ -191,6 +191,27 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
             }
         }
 
+        /* Handle ongoing events */
+        for (int i = 0; i < EVENT_COUNT; i++)
+        {
+            if (events[i].time * 1000 < clock && events[i].data > 0)
+            {
+                ongoing_events = true;
+
+                /* Is latency greater than 0? */
+                if (events[i].latency > 0)
+                {
+                    /* Decrease latency */
+                    events[i].latency--;
+                }
+                else
+                {
+                    /* Send data */
+                    send_data_to_router(graph, router_array, links_array, &events[i], &weights);
+                }
+            }
+        }
+
         for (int i = 0; i < igraph_vector_size(&events->path); i++)
         {
             if (routers[router_array[i].type].power.peak)
