@@ -6,7 +6,6 @@ typedef struct router
     int type;
     double utilisation;
     bool sleeping;
-    igraph_vector_t events;
 } router;
 
 typedef struct link
@@ -14,6 +13,7 @@ typedef struct link
     int max_bandwidth;
     int remaining_bandwidth;
     double utilisation;
+    igraph_vector_t events;
 } link;
 
 typedef struct event
