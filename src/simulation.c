@@ -263,21 +263,8 @@ void bandwidth_balancer(igraph_vector_t *path_edges, link *links_array, event *e
     if (igraph_vector_size(&link_overload) > 0)
     {
         /* Sort overloaded links by least remaining bandwidth */
-        int temp;
-        for (int i = 0; i < igraph_vector_size(&link_overload); i++)
-        {
-            for (int j = 0; j < igraph_vector_size(&link_overload) - 1; j++)
-            {
-                if (links_array[(int)igraph_vector_e(&link_overload, j)].remaining_bandwidth > links_array[(int)igraph_vector_e(&link_overload, j + 1)].remaining_bandwidth)
-                {
-                    temp = (int)igraph_vector_e(&link_overload, j);
-                    VECTOR(link_overload)
-                    [j] = (int)igraph_vector_e(&link_overload, j + 1);
-                    VECTOR(link_overload)
-                    [j + 1] = temp;
-                }
-            }
-        }
+        sort_links(links_array, &link_overload);
+
         
     }
 
@@ -285,3 +272,21 @@ void bandwidth_balancer(igraph_vector_t *path_edges, link *links_array, event *e
     igraph_vector_destroy(&link_overload);
 }
 
+void sort_links(link *links_array, igraph_vector_t *link_overload)
+{
+    int temp;
+    for (int i = 0; i < igraph_vector_size(link_overload); i++)
+    {
+        for (int j = 0; j < igraph_vector_size(link_overload) - 1; j++)
+        {
+            if (links_array[(int)igraph_vector_e(link_overload, j)].remaining_bandwidth > links_array[(int)igraph_vector_e(link_overload, j + 1)].remaining_bandwidth)
+            {
+                temp = (int)igraph_vector_e(link_overload, j);
+                VECTOR(*link_overload)
+                [j] = (int)igraph_vector_e(link_overload, j + 1);
+                VECTOR(*link_overload)
+                [j + 1] = temp;
+            }
+        }
+    }
+}

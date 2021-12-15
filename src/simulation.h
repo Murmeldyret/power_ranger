@@ -22,3 +22,4 @@ void establish_connections(igraph_t *, struct routerType *, struct trafficType *
 void send_data(igraph_t *, struct routerType *, struct trafficType *, event *, router *, link *);
 void add_event_to_links(int, igraph_vector_t *, link *);
 void bandwidth_balancer(igraph_vector_t *, link *, event *);
+void sort_links(link *, igraph_vector_t *);
