@@ -1,4 +1,4 @@
-1,Movie,1000ms,50MB,20Mbps,low,
-2,VoIP,50ms,1MB,2Mbps,medium,
-3,Torrent,500ms,169000MB,1000Mbps,high,
-4,FTP,100ms,2000MB,100Mbps,high,
+1,Movie,1000ms,50000KB,20000Kbps,low,
+2,VoIP,50ms,1000KB,2000Kbps,medium,
+3,Torrent,500ms,169000000KB,1000000Kbps,high,
+4,FTP,100ms,2000000KB,100000Kbps,high,

@@ -124,6 +124,7 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
     {
         events[i].time = (rand() % SIMULATION_TIME) + 1;
         events[i].type = (rand() % NMBR_OF_TRAFFICTYPES);
+        events[i].is_active = false;
         events[i].source_id = (rand() % igraph_vcount(graph));
         events[i].destination_id = (rand() % igraph_vcount(graph));
         events[i].data = traffic[events[i].type].data_size;
@@ -162,7 +163,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
 {
     /* Initialize variables */
 
-    int ongoing_events = 1;
+    int ongoing_events = 0;
     int clock = 0; /* In milliseconds */
     double data_transfer = 0;
 
@@ -173,7 +174,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
     }
 
     /* Run simulation and loop while there are ongoing events */
-    while (clock < SIMULATION_TIME * 1000 && ongoing_events) // TODO: Change && to || because else ongoing events won't count. However for debugging it is practical to not include ongoing events for now.
+    while (clock < SIMULATION_TIME * 1000 || ongoing_events) // TODO: Change && to || because else ongoing events won't count. However for debugging it is practical to not include ongoing events for now.
     {
         /* Check if there are any events */
         for (int i = 0; i < EVENT_COUNT; i++)
@@ -186,6 +187,8 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                 /* Add event to links event list */
                 add_event_to_links(i, &events[i].path_edges, links_array);
 
+                /* Set event to active */
+                events[i].is_active = true;
                 ongoing_events += 1;
 
                 /* Add latency to event */
@@ -200,46 +203,32 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         }
 
         /* Handle ongoing events */
-        for (int i = 0; i < EVENT_COUNT; i++)
+        if (ongoing_events)
         {
-            if (events[i].time * 1000 < clock && events[i].data > 0)
+            for (int i = 0; i < EVENT_COUNT; i++)
             {
-                ongoing_events = true;
+                if (events[i].time * 1000 < clock && events[i].data > 0)
+                {
 
-                /* Is latency greater than 0? */
-                if (events[i].latency > 0)
-                {
-                    /* Decrease latency */
-                    events[i].latency--;
-                }
-                else 
-                {
-                    // Calculate available bandwidth for each event
-                    for (int j = 0; j < igraph_vector_size(&events[i].path); j++)
+                    /* Is latency greater than 0? */
+                    if (events[i].latency > 0)
                     {
-                        events[i].available_bandwidth = routers[router_array[(int)igraph_vector_e(&events[j].path, j)].type].bandwidth - ((int)(events[i].data * 8) / events[i].bandwidth);
+                        /* Decrease latency */
+                        events[i].latency--;
                     }
-
-                    // Converting from MB to Mb
-                    data_transfer = events[i].data * 8;
-                    events[i].data *= 8;
-
-                    // loop until data has been tranfered
-                    for (int j = 0; events[i].data > 0 && j < ((int)data_transfer / events[i].bandwidth); j++)
+                    else
                     {
-                        events[i].data -= (data_transfer) / (double)events[i].bandwidth;
-                        
-                        // When tranfer is done
-                        if (events[i].data == 0) {
+                        // Converting from Kb to KB
+                        data_transfer = events[i].available_bandwidth / 1000 / 8;
 
-
-                            //printf("%d: transfered: %.lfMB remain: %.lfMb\n", i, data_transfer / 8, events[i].data);
-                        }
-                        else 
+                        /* Subtract data from event */
+                        events[i].data -= data_transfer;
+                        if (events[i].data <= 0)
                         {
-                            //printf("%d: transfer: %.lfMb\n", i, events[i].data);
+                            events[i].is_active = false;
+                            remove_event_from_links(i, &events[i].path_edges, links_array);
+                            ongoing_events -= 1;
                         }
-                        
                     }
                 }
             }
@@ -375,6 +364,22 @@ void cal_utilisation(int router_len, int link_len, router *router_array, link *l
     /* Iterate through all routers */
     for (int i = 0; i < router_len; i++)
     {
-        
+    }
+}
+
+void remove_event_from_links(int event_id, igraph_vector_t *path_edges, link *links_array)
+{
+    /* Iterate through all links */
+    for (int i = 0; i < igraph_vector_size(path_edges); i++)
+    {
+        /* Iterate through all events in link */
+        for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(path_edges, i)].events); j++)
+        {
+            /* Remove event from link */
+            if ((int)igraph_vector_e(&links_array[(int)igraph_vector_e(path_edges, i)].events, j) == event_id)
+            {
+                igraph_vector_remove(&links_array[(int)igraph_vector_e(path_edges, i)].events, j);
+            }
+        }
     }
 }
