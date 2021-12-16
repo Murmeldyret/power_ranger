@@ -164,6 +164,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
 
     int ongoing_events = 1;
     int clock = 0; /* In milliseconds */
+    double data_transfer = 0;
 
     // Set utilisation to 0
     for (int i = 0; i < igraph_vcount(graph); i++)
@@ -210,6 +211,36 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                 {
                     /* Decrease latency */
                     events[i].latency--;
+                }
+                else 
+                {
+                    // Calculate available bandwidth for each event
+                    for (int j = 0; j < igraph_vector_size(&events[i].path); j++)
+                    {
+                        events[i].available_bandwidth = routers[router_array[(int)igraph_vector_e(&events[j].path, j)].type].bandwidth - ((int)(events[i].data * 8) / events[i].bandwidth);
+                    }
+
+                    // Converting from MB to Mb
+                    data_transfer = events[i].data * 8;
+                    events[i].data *= 8;
+
+                    // loop until data has been tranfered
+                    for (int j = 0; events[i].data > 0 && j < ((int)data_transfer / events[i].bandwidth); j++)
+                    {
+                        events[i].data -= (data_transfer) / (double)events[i].bandwidth;
+                        
+                        // When tranfer is done
+                        if (events[i].data == 0) {
+
+
+                            //printf("%d: transfered: %.lfMB remain: %.lfMb\n", i, data_transfer / 8, events[i].data);
+                        }
+                        else 
+                        {
+                            //printf("%d: transfer: %.lfMb\n", i, events[i].data);
+                        }
+                        
+                    }
                 }
             }
         }
