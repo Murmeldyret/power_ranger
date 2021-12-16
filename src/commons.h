@@ -6,12 +6,13 @@ typedef struct router
     int type;
     double utilisation;
     bool sleeping;
+    igraph_vector_t *att_links;    /* Attached links */
 } router;
 
 typedef struct link
 {
     int max_bandwidth;
-    int remaining_bandwidth;
+    double remaining_bandwidth;
     double utilisation;
     igraph_vector_t events;
 } link;
@@ -23,7 +24,7 @@ typedef struct event
     int latency; //Latency of the event in seconds.
     double data; // How much data should be transfered in MB.
     int bandwidth; //Bandwidth of the event in Mbps.
-    int available_bandwidth; //Available bandwidth of the event in Mbps.
+    double available_bandwidth; //Available bandwidth of the event in Mbps.
     int source_id;
     int destination_id;
     igraph_vector_t path;

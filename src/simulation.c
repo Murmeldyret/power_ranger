@@ -193,9 +193,8 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                     events[i].latency += routers[router_array[(int)igraph_vector_e(&events[j].path, j)].type].latency;
                 }
 
-                // ! Calculate available bandwidth for the links affected by the new connection.
-
                 bandwidth_balancer(i, &events[i].path_edges, links_array, events);
+                cal_utilisation(igraph_vcount(graph), igraph_ecount(graph), router_array, links_array, events);
             }
         }
 
@@ -280,7 +279,11 @@ void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_a
             /* Apply bandwidth percentage to each event */
             for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(&link_overload, i)].events); j++)
             {
-                event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth = (int)(bandwidth_percentage[j] * event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth);
+                double new_bandwidth = (bandwidth_percentage[j] * event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth);
+                if (event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth > new_bandwidth)
+                {
+                    event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth = new_bandwidth;
+                }
             }
         }
     }
@@ -318,5 +321,29 @@ void sort_links(link *links_array, igraph_vector_t *link_overload)
                 [j + 1] = temp;
             }
         }
+    }
+}
+
+void cal_utilisation(int router_len, int link_len, router *router_array, link *links_array, event *event)
+{
+    /* Iterate through all links */
+    for (int i = 0; i < link_len; i++)
+    {
+        double bandwidth_used = 0;
+        /* Iterate through all events in link */
+        for (int j = 0; j < igraph_vector_size(&links_array[i].events); j++)
+        {
+            /* Add bandwidth used by event to total bandwidth used */
+            bandwidth_used += event[(int)igraph_vector_e(&links_array[i].events, j)].available_bandwidth;
+        }
+
+        /* Calculate utilisation */
+        links_array[i].utilisation = (bandwidth_used / links_array[i].max_bandwidth) * 100;
+    }
+
+    /* Iterate through all routers */
+    for (int i = 0; i < router_len; i++)
+    {
+        
     }
 }
