@@ -6,7 +6,7 @@ typedef struct router
     int type;
     double utilisation;
     bool sleeping;
-    igraph_vector_t *att_links;    /* Attached links */
+    igraph_vector_t att_links;    /* Attached links */
 } router;
 
 typedef struct link

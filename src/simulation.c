@@ -1,7 +1,7 @@
 #include "simulation.h"
 #include <time.h>
 
-#define EVENT_COUNT 100
+#define EVENT_COUNT 10
 /* In seconds */
 #define SIMULATION_TIME 100
 
@@ -89,6 +89,26 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
         igraph_vector_init(&links_array[i].events, 0);
         j += 2;
     }
+
+    /* Initialize att_links array */
+    for (i = 0; i < nodes; i++)
+    {
+        igraph_vector_init(&routers[i].att_links, 0);
+    }
+
+    /* Iterate through all edges and add edges to routers */
+    j = 0;
+    for (i = 0; i < igraph_ecount(graph); i++)
+    {
+        igraph_vector_push_back(&routers[(int)igraph_vector_e(&edges, j)].att_links, i);
+        igraph_vector_push_back(&routers[(int)igraph_vector_e(&edges, j + 1)].att_links, i);
+        j += 2;
+
+        printf("%d %d\n", (int)igraph_vector_e(&edges, j), (int)igraph_vector_e(&edges, j + 1));
+    }
+
+    /* Free memory */
+    igraph_vector_destroy(&edges);
 }
 
 /**
@@ -349,21 +369,24 @@ void cal_utilisation(int router_len, int link_len, router *router_array, link *l
     /* Iterate through all links */
     for (int i = 0; i < link_len; i++)
     {
-        double bandwidth_used = 0;
-        /* Iterate through all events in link */
-        for (int j = 0; j < igraph_vector_size(&links_array[i].events); j++)
-        {
-            /* Add bandwidth used by event to total bandwidth used */
-            bandwidth_used += event[(int)igraph_vector_e(&links_array[i].events, j)].available_bandwidth;
-        }
-
         /* Calculate utilisation */
-        links_array[i].utilisation = (bandwidth_used / links_array[i].max_bandwidth) * 100;
+        links_array[i].utilisation = ((links_array[i].max_bandwidth - links_array[i].remaining_bandwidth) / links_array[i].max_bandwidth) * 100;
     }
 
     /* Iterate through all routers */
     for (int i = 0; i < router_len; i++)
     {
+        /* Calculate router utilisation */
+        double avg_utilisation = 0;
+        for (int j = 0; j < igraph_vector_size(&router_array[i].att_links); j++)
+        {
+            avg_utilisation += links_array[(int)igraph_vector_e(&router_array[i].att_links, j)].utilisation;
+        }
+
+        avg_utilisation /= (double)igraph_vector_size(&router_array[i].att_links);
+
+        router_array[i].utilisation = avg_utilisation;
+        printf("Router %d utilisation: %f\n", i, router_array[i].utilisation);
     }
 }
 
