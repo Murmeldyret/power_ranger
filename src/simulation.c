@@ -1,7 +1,7 @@
 #include "simulation.h"
 #include <time.h>
 
-#define EVENT_COUNT 500
+#define EVENT_COUNT 100
 /* In seconds */
 #define SIMULATION_TIME 100
 
@@ -29,7 +29,7 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic)
     run_simulation_loop(&graph, routers, traffic, routers_array, links_array);
 
     // Free memory
-    
+
     for (int i = 0; i < nodes; i++)
     {
         igraph_vector_destroy(&routers_array[i].att_links);
@@ -96,7 +96,6 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
         }
         links_array[i].remaining_bandwidth = links_array[i].max_bandwidth;
         links_array[i].utilisation = 0;
-        
 
         igraph_vector_init(&links_array[i].events, 0);
         j += 2;
@@ -250,17 +249,16 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                     {
                         // Converting from Kb to KB
                         data_transfer = events[i].available_bandwidth / 1000 / 8;
-                        
 
                         /* Subtract data from event */
                         events[i].data -= data_transfer;
-                        
-                        
 
                         if (events[i].data <= 0)
                         {
                             events[i].is_active = false;
                             remove_event_from_links(i, &events[i].path_edges, links_array);
+                            /* Release bandwidth on links */
+                            release_bandwidth(i, &events[i].path_edges, links_array, events);
                             ongoing_events -= 1;
                         }
                     }
@@ -292,6 +290,7 @@ void add_event_to_links(int event_id, igraph_vector_t *path_edges, link *links_a
 void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_array, event *event)
 {
     double sum_bandwidth;
+    double temp_bandwidth;
     igraph_vector_t link_overload;
 
     igraph_vector_init(&link_overload, 0);
@@ -344,8 +343,18 @@ void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_a
                 double new_bandwidth = bandwidth_percentage[j] * links_array[(int)igraph_vector_e(&link_overload, i)].max_bandwidth;
                 if (event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth > new_bandwidth)
                 {
+                    /* release bandwidth on link if the event is not event_id */
+                    if (igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j) != event_id)
+                    {
+                        temp_bandwidth = event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth - new_bandwidth;
+                        links_array[(int)igraph_vector_e(&link_overload, i)].remaining_bandwidth += temp_bandwidth;
+                    }
+                    else
+                    {
+                        links_array[(int)igraph_vector_e(&link_overload, i)].remaining_bandwidth -= new_bandwidth;
+                    }
+
                     event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth = new_bandwidth;
-                    
                 }
             }
 
@@ -429,5 +438,15 @@ void remove_event_from_links(int event_id, igraph_vector_t *path_edges, link *li
                 igraph_vector_remove(&links_array[(int)igraph_vector_e(path_edges, i)].events, j);
             }
         }
+    }
+}
+
+void release_bandwidth(int event_id, igraph_vector_t *path_edges, link *links_array, event *events)
+{
+    /* Iterate through links affected by event */
+    for (int i = 0; i < igraph_vector_size(path_edges); i++)
+    {
+        /* Release bandwidth */
+        links_array[(int)igraph_vector_e(path_edges, i)].remaining_bandwidth += events[event_id].available_bandwidth;
     }
 }

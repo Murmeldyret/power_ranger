@@ -25,3 +25,4 @@ void bandwidth_balancer(int, igraph_vector_t *, link *, event *);
 void sort_links(link *, igraph_vector_t *);
 void cal_utilisation(int, int, router *, link *, event *);
 void remove_event_from_links(int, igraph_vector_t *, link *);
+void release_bandwidth(int, igraph_vector_t *, link *, event *);
