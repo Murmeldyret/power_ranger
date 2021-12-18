@@ -11,7 +11,7 @@ typedef struct router
 
 typedef struct link
 {
-    int max_bandwidth;
+    double max_bandwidth;
     double remaining_bandwidth;
     double utilisation;
     igraph_vector_t events;  // Indexes of events
@@ -24,7 +24,7 @@ typedef struct event
     int time; //Time of when it happens in seconds.
     int latency; //Latency of the event in seconds.
     double data; // How much data should be transfered in KB.
-    int bandwidth; //Bandwidth of the event in Kbps.
+    double bandwidth; //Bandwidth of the event in Kbps.
     double available_bandwidth; //Available bandwidth of the event in Kbps.
     int source_id;
     int destination_id;
