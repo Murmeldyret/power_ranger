@@ -300,7 +300,6 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         if (clock % 1000 == 0)
         {
             cal_power_consumption(igraph_vcount(graph), router_array, routers, &temp_power_consumption);
-            printf("%d\t%f\n", clock / 1000, temp_power_consumption);
         }
 
         /* Check if routers should go to sleep */
@@ -594,7 +593,6 @@ void check_router_activity(int router_len, router *router_array, struct routerTy
                     router_array[i].sleeping = 1;
                     router_array[i].inactivity_counter = 0;
                     router_array[i].utilisation = 0;
-                    printf("Router %d is sleeping\n", i);
                 }
             }
         }
