@@ -1,8 +1,8 @@
 #include <stdbool.h>
 
 
-#define NMBR_OF_ROUTERTYPES 3 //number of routertypes from routerType.csv
-#define NMBR_OF_TRAFFICTYPES 4 // number of routertypes from trafficTypes.csv
+#define NMBR_OF_ROUTERTYPES 4 //number of routertypes from routerType.csv
+#define NMBR_OF_TRAFFICTYPES 8 // number of routertypes from trafficTypes.csv
 #define CSV_MAX_CHAR_LEN 16 // MAX length of struct element strings
 // Types, prototypes and functions (in order :))
 
@@ -12,7 +12,7 @@ typedef struct routerType
     // .csv elements appear in same order
     int id;
     char type[CSV_MAX_CHAR_LEN]; 
-    int bandwidth; //Mbps
+    int bandwidth; //Kbps
     int wakeup_time; //ms
     int latency; //ms
     struct power
@@ -30,7 +30,7 @@ typedef struct trafficType
     int id; //int
     char type[CSV_MAX_CHAR_LEN];
     int latency_sensitivity; //ms
-    int data_size; //MB
+    int data_size; //KB
     int speed;
     char packetloss_sensitivity[CSV_MAX_CHAR_LEN]; 
 } trafficType;

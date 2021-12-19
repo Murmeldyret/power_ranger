@@ -23,6 +23,5 @@ int main(void)
 
     display_data();    //TODO: Make this function
 
-    
     return 0;
 }
