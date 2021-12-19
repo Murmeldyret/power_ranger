@@ -23,6 +23,7 @@ void run_simulation_loop(igraph_t *, struct routerType *, struct trafficType *, 
 void establish_connections(igraph_t *, struct routerType *, struct trafficType *, link *, igraph_vector_t *, igraph_vector_t *, int, int);
 void send_data(igraph_t *, struct routerType *, struct trafficType *, event *, router *, link *, simulationData *);
 void add_event_to_links(int, igraph_vector_t *, link *);
+void wake_up_routers(igraph_t *, struct routerType *, router *, igraph_vector_t *, int *);
 void bandwidth_balancer(int, igraph_vector_t *, link *, event *);
 void sort_links(link *, igraph_vector_t *);
 void cal_utilisation(int, int, router *, link *, event *);

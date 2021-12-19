@@ -6,6 +6,7 @@ typedef struct router
     int type;
     double utilisation;
     int sleeping;              // 0 = awake, 1 = sleeping, 2 = waking up
+    int inactivity_counter;    // counts how many times the router has been inactive
     igraph_vector_t att_links; /* Attached links */
 } router;
 

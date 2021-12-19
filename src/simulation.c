@@ -1,7 +1,7 @@
 #include "simulation.h"
 #include <time.h>
 
-#define EVENT_COUNT 10
+#define EVENT_COUNT 1
 /* In seconds */
 #define SIMULATION_TIME 100
 
@@ -17,7 +17,7 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic, sim
     int edges;
     igraph_t graph;
 
-    nodes = 1000;
+    nodes = 10;
     edges = 3;
 
     router *routers_array = (router *)malloc(nodes * sizeof(struct router));
@@ -77,6 +77,7 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
         routers[i].type = rand() % NMBR_OF_ROUTERTYPES;
         routers[i].utilisation = 0;
         routers[i].sleeping = 0;
+        routers[i].inactivity_counter = 0;
         igraph_vector_init(&routers[i].att_links, 0);
     }
 
@@ -234,6 +235,9 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                 /* Add event to links event list */
                 add_event_to_links(i, &events[i].path_edges, links_array);
 
+                /* Awake sleeping routers */
+                wake_up_routers(graph, routers, router_array, &events[i].path, events[i].latency);
+
                 /* Set event to active */
                 events[i].is_active = true;
                 ongoing_events += 1;
@@ -296,11 +300,14 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         if (clock % 1000 == 0)
         {
             cal_power_consumption(igraph_vcount(graph), router_array, routers, &temp_power_consumption);
-            printf("Current power consumption: %f Wh\n", temp_power_consumption);
-            printf("\n");
+            printf("%d\t%f\n", clock / 1000, temp_power_consumption);
         }
 
-        
+        /* Check if routers should go to sleep */
+        if (clock % 1000 == 0)
+        {
+            check_router_activity(igraph_vcount(graph), router_array, routers, links_array);
+        }
 
         /* Move clock forward */
         clock++;
@@ -313,6 +320,29 @@ void add_event_to_links(int event_id, igraph_vector_t *path_edges, link *links_a
     {
         igraph_vector_push_back(&links_array[(int)igraph_vector_e(path_edges, i)].events, event_id);
     }
+}
+
+void wake_up_routers(igraph_t *graph, struct routerType *routers, router *router_array, igraph_vector_t *path, int *latency)
+{
+    int longest_latency = 0;
+    /* Check if routers in the path are sleeping */
+    for (int i = 0; i < igraph_vector_size(path); i++)
+    {
+        if (router_array[(int)igraph_vector_e(path, i)].sleeping)
+        {
+            /* Wake up router */
+            router_array[(int)igraph_vector_e(path, i)].sleeping = 2;
+
+            /* Set latency if it is greater than the current latency */
+            if (routers[router_array[(int)igraph_vector_e(path, i)].type].wakeup_time > longest_latency)
+            {
+                longest_latency = routers[router_array[(int)igraph_vector_e(path, i)].type].wakeup_time;
+            }
+        }
+        router_array[(int)igraph_vector_e(path, i)].inactivity_counter = 0;
+    }
+
+    latency += longest_latency;
 }
 
 void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_array, event *event)
@@ -483,14 +513,31 @@ void cal_power_consumption(int router_len, router *router_array, struct routerTy
 {
     double *temp_power_con = (double *)malloc(sizeof(double) * router_len); /* Temporary power consumption in milliWatts */
     double power_sum = 0;                                                   /* Sum of power consumption in milliwatts */
+    double offset;                                                             /* Offset of milliseconds to calculate linearly (Used to not calculate for the power used by a router that is starting up) */
+
+    /* Set temp power consumption to 0 */
+    for (int i = 0; i < router_len; i++)
+    {
+        temp_power_con[i] = 0;
+    }
 
     /* Iterate through all routers */
     for (int i = 0; i < router_len; i++)
     {
+        offset = 1;
         switch (router_array[i].sleeping)
         {
+        case 2:
+            offset = (1000 - t_routers[router_array[i].type].wakeup_time) / 1000;
+            temp_power_con[i] = t_routers[router_array[i].type].power.sleep * (1 - offset);
+            router_array[i].sleeping = 0; /* Set sleeping to 0 since the power consumption is calculated */
+
         case 0:
-            temp_power_con[i] = linear_power_con(t_routers[router_array[i].type].power.idle, t_routers[router_array[i].type].power.peak, router_array[i].utilisation);
+            temp_power_con[i] = linear_power_con(t_routers[router_array[i].type].power.idle, t_routers[router_array[i].type].power.peak, router_array[i].utilisation, offset);
+            break;
+
+        case 1:
+            temp_power_con[i] = t_routers[router_array[i].type].power.sleep;
             break;
 
         default:
@@ -509,4 +556,47 @@ void cal_power_consumption(int router_len, router *router_array, struct routerTy
 
     /* Free memory */
     free(temp_power_con);
+}
+
+void check_router_activity(int router_len, router *router_array, struct routerType *t_routers, link *links_array)
+{
+
+    /* Iterate through all routers that are not sleeping */
+
+    for (int i = 0; i < router_len; i++)
+    {
+        if (router_array[i].sleeping == 0)
+        {
+            bool has_events = false;
+            /* This is actually a stupid way of doing this, but there's no time to do it properly */
+
+            /* Check all links connected to router */
+            for (int j = 0; j < igraph_vector_size(&router_array[i].att_links); j++)
+            {
+                /* Check if link has events */
+                if (igraph_vector_size(&links_array[(int)igraph_vector_e(&router_array[i].att_links, j)].events) > 0)
+                {
+                    has_events = true;
+                    break; /* No need to check the rest of the links */
+                }
+            }
+
+            /* If no events are found */
+            if (!has_events)
+            {
+                /* Set inactivity counter 1 up */
+                router_array[i].inactivity_counter++;
+
+                /* If inactivity counter is equal to the inactivity time */
+                if (router_array[i].inactivity_counter == 60)
+                {
+                    /* Set sleeping to 1 */
+                    router_array[i].sleeping = 1;
+                    router_array[i].inactivity_counter = 0;
+                    router_array[i].utilisation = 0;
+                    printf("Router %d is sleeping\n", i);
+                }
+            }
+        }
+    }
 }

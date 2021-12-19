@@ -78,7 +78,7 @@ double g(double x)
     return 2.0 * pow(x, 2) - 320.0 * x + 12800.0;
 }
 
-double linear_power_con(int idle, int peak, double utilisation)
+double linear_power_con(int idle, int peak, double utilisation, double offset)
 {
     /* Convert from Wh to mWs */
     double idle_mW = idle / 3.6;
@@ -90,5 +90,5 @@ double linear_power_con(int idle, int peak, double utilisation)
     double b = idle;
 
     /* Calculate the power consumption */
-    return a * utilisation + b;
+    return (a * utilisation + b) * offset;
 }
