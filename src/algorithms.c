@@ -75,5 +75,5 @@ double f(double x)
  */
 double g(double x)
 {
-    return (5.0 / 8.0) * pow(x, 2) - 100.0 * x + 4000.0;
+    return 2.0 * pow(x, 2) - 320.0 * x + 12800.0;
 }
