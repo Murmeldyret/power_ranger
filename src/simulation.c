@@ -1,7 +1,7 @@
 #include "simulation.h"
 #include <time.h>
 
-#define EVENT_COUNT 100
+#define EVENT_COUNT 10
 /* In seconds */
 #define SIMULATION_TIME 100
 
@@ -10,14 +10,14 @@
  * Inputs: Validated data
  * Output: struct simulationData
  */
-void run_simulation(struct routerType *routers, struct trafficType *traffic)
+void run_simulation(struct routerType *routers, struct trafficType *traffic, simulationData *out_data)
 {
     // Initialize variables for populate network
     int nodes;
     int edges;
     igraph_t graph;
 
-    nodes = 100;
+    nodes = 1000;
     edges = 3;
 
     router *routers_array = (router *)malloc(nodes * sizeof(struct router));
@@ -26,7 +26,11 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic)
     // Initialize array of Router
     populate_network(nodes, edges, &graph, routers_array, links_array, routers);
 
-    run_simulation_loop(&graph, routers, traffic, routers_array, links_array);
+    /* Add setup data to out_data */
+    out_data->total_nodes = nodes;
+    out_data->total_links = (int)igraph_ecount(&graph);
+
+    run_simulation_loop(&graph, routers, traffic, routers_array, links_array, out_data);
 
     // Free memory
 
@@ -72,7 +76,7 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
     {
         routers[i].type = rand() % NMBR_OF_ROUTERTYPES;
         routers[i].utilisation = 0;
-        routers[i].sleeping = false;
+        routers[i].sleeping = 0;
         igraph_vector_init(&routers[i].att_links, 0);
     }
 
@@ -119,7 +123,7 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
  * Inputs: Validated data, graph
  * Output: struct simulationData
  */
-void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, router *routers_array, link *links_array)
+void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, router *routers_array, link *links_array, simulationData *out_data)
 {
     // Initialize variables
 
@@ -132,8 +136,10 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
     // Create random events
     create_events(graph, traffic, events);
 
+    out_data->total_amount_of_data = cal_total_data(events, EVENT_COUNT);
+
     // Run simulation
-    send_data(graph, routers, traffic, events, routers_array, links_array);
+    send_data(graph, routers, traffic, events, routers_array, links_array, out_data);
 
     /* Free memory */
     for (int i = 0; i < EVENT_COUNT; i++)
@@ -164,6 +170,18 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
     }
 }
 
+double cal_total_data(const event *events, int event_count)
+{
+    double total_data = 0;
+    int i;
+    for (i = 0; i < event_count; i++)
+    {
+        total_data += events[i].data / 1024 / 1024;
+    }
+
+    return total_data;
+}
+
 /**
  * Description: Connection between nodes and edges
  * Inputs:
@@ -187,10 +205,10 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
  * Inputs:
  * Output:
  */
-void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events, router *router_array, link *links_array)
+void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events, router *router_array, link *links_array, simulationData *out_data)
 {
     /* Initialize variables */
-
+    double temp_power_consumption = 0;
     int ongoing_events = 0;
     int clock = 0; /* In milliseconds */
     double data_transfer = 0;
@@ -273,6 +291,16 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                 router_array[i].utilisation += 0;
             }
         }
+
+        /* Calculate power consumption every second */
+        if (clock % 1000 == 0)
+        {
+            cal_power_consumption(igraph_vcount(graph), router_array, routers, &temp_power_consumption);
+            printf("Current power consumption: %f Wh\n", temp_power_consumption);
+            printf("\n");
+        }
+
+        
 
         /* Move clock forward */
         clock++;
@@ -449,4 +477,36 @@ void release_bandwidth(int event_id, igraph_vector_t *path_edges, link *links_ar
         /* Release bandwidth */
         links_array[(int)igraph_vector_e(path_edges, i)].remaining_bandwidth += events[event_id].available_bandwidth;
     }
+}
+
+void cal_power_consumption(int router_len, router *router_array, struct routerType *t_routers, double *power_con)
+{
+    double *temp_power_con = (double *)malloc(sizeof(double) * router_len); /* Temporary power consumption in milliWatts */
+    double power_sum = 0;                                                   /* Sum of power consumption in milliwatts */
+
+    /* Iterate through all routers */
+    for (int i = 0; i < router_len; i++)
+    {
+        switch (router_array[i].sleeping)
+        {
+        case 0:
+            temp_power_con[i] = linear_power_con(t_routers[router_array[i].type].power.idle, t_routers[router_array[i].type].power.peak, router_array[i].utilisation);
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    /* Calculate sum of power consumption */
+    for (int i = 0; i < router_len; i++)
+    {
+        power_sum += temp_power_con[i];
+    }
+
+    /* Add sum to power consumption and convert back to Wh */
+    *power_con += power_sum * 3.6;
+
+    /* Free memory */
+    free(temp_power_con);
 }
