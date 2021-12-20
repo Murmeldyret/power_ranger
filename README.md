@@ -25,6 +25,18 @@ Output of the test software should return something along the lines of.
 
 ## Installation Options
 
+## Configuration files
+Routertype.csv
+
+| id  | type(int) | bandwidth(int) | wakeupTime (int) | latency(int) | powerIdle(int) | powerPeak (int) | powerSleep | packetMemory (int) |
+| --- | --------- | -------------- | ---------------- | ------------ | -------------- | --------------- | ---------- | ------------------ |
+| 1   | fafb      | 10000000Kbps   | 50ms             | 1ms          | 100W           | 250W            | 20W        | 16000B             |
+
+Traffictype.csv
+| id  | type(string)[16] | latencySensitivity(int) | dataSize (int) | packetlossSensitivity(int) |     |
+| --- | ------------ | ----------------------- | -------------- | -------------------------- | --- |
+| 1   | Movie        | 1000ms                  | 50000KB        | 20000Kbps                  | low |
+
 
 ## Dependencies
 - CMake - https://cmake.org/
