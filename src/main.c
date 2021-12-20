@@ -15,14 +15,14 @@ int main(void)
     simulationData data;
     printf("🗿ඞ\n");
 
-    initialise_data(routertypes, traffictypes); //TODO: Make this function
+    initialise_data(routertypes, traffictypes);
     //prints structs of relevant type
     //printRouterTypeElements(routertypes[0]);
     //printTrafficTypeElements(traffictypes[0]);
 
-    run_simulation(routertypes, traffictypes, &data);  //TODO: Make this function
+    run_simulation(routertypes, traffictypes, &data);
 
-    display_data(&data); //TODO: Make this function
+    display_data(&data);
 
-    return 0;
+    return EXIT_SUCCESS; /* Successful termination */
 }
