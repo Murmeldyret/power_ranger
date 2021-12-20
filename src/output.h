@@ -1,1 +1,1 @@
-void display_data();
+void display_data(simulationData *);
