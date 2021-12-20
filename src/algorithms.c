@@ -1,5 +1,4 @@
 #include "algorithms.h"
-#include <igraph.h>
 #include <math.h>
 
 /**
@@ -8,8 +7,18 @@
  * Inputs: graph, source node
  * Output: distance, predecessor
  */
-void bellman_ford()
-{
+void bellman_ford(igraph_t *graph, igraph_vector_t *vertices, igraph_vector_t *edges, igraph_integer_t from, igraph_integer_t to, igraph_vector_t *weights)
+{    
+    igraph_get_shortest_path_bellman_ford(graph,
+                                          vertices,
+                                          edges,
+                                          from,
+                                          to,
+                                          weights,
+                                          IGRAPH_ALL);
+
+    
+    
 }
 
 /**
@@ -18,26 +27,34 @@ void bellman_ford()
  * Inputs: graph, routerType, trafficType
  * Output: weight in vector
  */
-void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, double *utilisation, igraph_vector_t *weights)
+void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, link *links_array, igraph_vector_t *edges, igraph_vector_t *weights)
 {
+    int i;
+    int j;
     
-    for (int i = 0; i < igraph_vcount(graph); i++)
+    igraph_vector_t router_weights;
+
+
+    igraph_vector_init(&router_weights, igraph_vcount(graph));
+    igraph_get_edgelist(graph, edges, false);
+
+    /* Calculate the weight of each router */
+    for (int i = 0; i < igraph_ecount(graph); i++)
     {
-        if (utilisation[i] < 80)
+        if (links_array[i].utilisation < 80)
         {
-            igraph_vector_set(weights, i, f(utilisation[i]));
+            igraph_vector_set(weights, i, f(links_array[i].utilisation));
         }
-        else if (utilisation[i] >= 80)
+        else if (links_array[i].utilisation >= 80)
         {
-            igraph_vector_set(weights, i, g(utilisation[i]));
+            igraph_vector_set(weights, i, g(links_array[i].utilisation));
         }
         else
         {
-            utilisation[i] = 0;
+            links_array[i].utilisation = 0;
         }
     }
 }
-
 
 /**
  * Function: f
@@ -58,5 +75,5 @@ double f(double x)
  */
 double g(double x)
 {
-    return (5.0 / 8.0) * pow(x, 2) - 100.0 * x + 4000.0;
+    return 2.0 * pow(x, 2) - 320.0 * x + 12800.0;
 }

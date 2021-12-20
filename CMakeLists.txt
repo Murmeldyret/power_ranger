@@ -2,20 +2,18 @@ cmake_minimum_required(VERSION 3.16)
 
 # Project name
 project(power_ranger)
-
-# Add json-c library
-find_package(json-c REQUIRED)
+project(test_ranger)
 
 # Add igraph library
 find_package(igraph REQUIRED)
-
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 # Add the executable
 add_executable(power_ranger src/main.c src/algorithms.c src/data.c src/output.c src/simulation.c)
-target_link_libraries(power_ranger PUBLIC igraph::igraph)
+add_executable(test_ranger tests/test.c)
 
+target_link_libraries(power_ranger PUBLIC igraph::igraph)
 
 # target include directory for config folder
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/config)
