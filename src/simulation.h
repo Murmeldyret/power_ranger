@@ -6,6 +6,7 @@ typedef struct simulationData
     double simulation_time[3];         //Time taken to complete simulation in seconds
     int total_nodes;                   //Total number of nodes in network
     int total_links;                   //Total number of links in network
+    int total_events;                  //Total number of events in network
     double total_amount_of_data;       //Total amount of data in network (in GB)
 } simulationData;
 

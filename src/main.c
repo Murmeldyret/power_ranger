@@ -21,6 +21,8 @@ int main(void)
 
     recieve_setup(&setup);
 
+    data.total_events = setup.event_count;
+
     initialise_data(routertypes, traffictypes);
     //prints structs of relevant type
     //printRouterTypeElements(routertypes[0]);

@@ -32,6 +32,7 @@ void display_data(simulationData *data)
     fprintf(fp, "Simulation setup:\n");
     fprintf(fp, "Number of routers:,%d\n", data->total_nodes);
     fprintf(fp, "Number of links:,%d\n", data->total_links);
+    fprintf(fp, "Number of events:,%d\n", data->total_events);
     fprintf(fp, "Total amount of data:,%lf,GB\n\n", data->total_amount_of_data);
 
     /* Print simulation state and power consumption */
