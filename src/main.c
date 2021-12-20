@@ -26,7 +26,7 @@ int main(void)
     //printRouterTypeElements(routertypes[0]);
     //printTrafficTypeElements(traffictypes[0]);
 
-    run_simulation(routertypes, traffictypes, &data);
+    run_simulation(routertypes, traffictypes, &data, &setup);
 
     display_data(&data);
 
