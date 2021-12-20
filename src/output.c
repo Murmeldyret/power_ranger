@@ -39,4 +39,6 @@ void display_data(simulationData *data)
     results.path_ptr = results.path_ptr->next;
 
     fprintf(fp, "\n");
+
+    fclose(fp);
 }
