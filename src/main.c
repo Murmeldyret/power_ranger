@@ -12,6 +12,7 @@ int main(void)
 
     routerType routertypes[NMBR_OF_ROUTERTYPES];
     trafficType traffictypes[NMBR_OF_TRAFFICTYPES];
+    simulationData data;
     printf("🗿ඞ\n");
 
     initialise_data(routertypes, traffictypes); //TODO: Make this function
@@ -19,7 +20,7 @@ int main(void)
     //printRouterTypeElements(routertypes[0]);
     //printTrafficTypeElements(traffictypes[0]);
 
-    run_simulation(routertypes, traffictypes); //TODO: Make this function
+    run_simulation(routertypes, traffictypes, &data);  //TODO: Make this function
 
     display_data(data); //TODO: Make this function
 

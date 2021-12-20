@@ -77,3 +77,18 @@ double g(double x)
 {
     return 2.0 * pow(x, 2) - 320.0 * x + 12800.0;
 }
+
+double linear_power_con(int idle, int peak, double utilisation, double offset)
+{
+    /* Convert from Wh to mWs */
+    double idle_mW = idle / 3.6;
+    double peak_mW = peak / 3.6;
+
+
+    /* Calculate a and b in a linear function */
+    double a = (peak - idle) / 100.0;
+    double b = idle;
+
+    /* Calculate the power consumption */
+    return (a * utilisation + b) * offset;
+}
