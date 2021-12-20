@@ -1,18 +1,11 @@
 #include "algorithms.h"
 
-typedef struct chain
-{
-    int data;
-    struct chain *next;
-} chain;
-
 typedef struct simulationData
 {
     double total_power_consumption[3]; //Power consumed by network
-    chain current_path;             // * router needs individual id!
-    int total_nodes;                //Total number of nodes in network
-    int total_links;                //Total number of links in network
-    double total_amount_of_data;    //Total amount of data in network (in GB)
+    int total_nodes;                   //Total number of nodes in network
+    int total_links;                   //Total number of links in network
+    double total_amount_of_data;       //Total amount of data in network (in GB)
 } simulationData;
 
 void run_simulation(struct routerType *, struct trafficType *, struct simulationData *);
