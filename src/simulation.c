@@ -144,7 +144,7 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
         link_e *links_temp = (link_e *)malloc(out_data->total_links * sizeof(struct link_e));
         copy_sim_data(graph, events, routers_array, links_array, setup, events_temp, routers_temp, links_temp);
 
-        send_data(graph, routers, traffic, events_temp, routers_temp, links_temp, setup, i, &out_data->total_power_consumption[i]);
+        send_data(graph, routers, traffic, events_temp, routers_temp, links_temp, setup, i, out_data);
 
         /* Free memory */
         free(events_temp);
@@ -261,7 +261,7 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
  * Inputs: Validated data, graph, router properties, event properties, test state, total power consumption
  * Output: total power consumption
  */
-void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events, router *router_array, link_e *links_array, const sim_setup *setup, int test_state, double *total_power_con)
+void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events, router *router_array, link_e *links_array, const sim_setup *setup, int test_state, simulationData *out_data)
 {
     /* Initialize variables */
     double temp_power_consumption = 0;
@@ -380,7 +380,8 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
     temp_power_MW += temp_power_consumption / 1000000;
 
     /* Return total power consumption */
-    *total_power_con = temp_power_MW;
+    out_data->total_power_consumption[test_state] = temp_power_MW;
+    out_data->simulation_time[test_state] = clock / 1000; // In seconds
 }
 
 void add_event_to_links(int event_id, igraph_vector_t *path_edges, link_e *links_array)
