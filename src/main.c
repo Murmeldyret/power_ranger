@@ -22,7 +22,7 @@ int main(void)
 
     run_simulation(routertypes, traffictypes, &data);  //TODO: Make this function
 
-    display_data(data); //TODO: Make this function
+    display_data(&data); //TODO: Make this function
 
     return 0;
 }

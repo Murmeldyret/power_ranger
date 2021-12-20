@@ -10,13 +10,13 @@ typedef struct router
     igraph_vector_t att_links; /* Attached links */
 } router;
 
-typedef struct link
+typedef struct link_e
 {
     double max_bandwidth;
     double remaining_bandwidth;
     double utilisation;
     igraph_vector_t events; // Indexes of events
-} link;
+} link_e;
 
 typedef struct event
 {

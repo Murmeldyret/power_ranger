@@ -27,7 +27,7 @@ void bellman_ford(igraph_t *graph, igraph_vector_t *vertices, igraph_vector_t *e
  * Inputs: graph, routerType, trafficType
  * Output: weight in vector
  */
-void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, link *links_array, igraph_vector_t *edges, igraph_vector_t *weights)
+void cal_link_weights(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, link_e *links_array, igraph_vector_t *edges, igraph_vector_t *weights)
 {
     int i;
     int j;
