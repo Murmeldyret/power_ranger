@@ -21,3 +21,5 @@ target_link_libraries(test_ranger PUBLIC igraph::igraph)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/config)
 
 add_custom_command(TARGET power_ranger POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/config/ $<TARGET_FILE_DIR:power_ranger>/config)
+
+make_directory(${CMAKE_CURRENT_BINARY_DIR}/outputs)
