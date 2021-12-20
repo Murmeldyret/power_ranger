@@ -8,12 +8,14 @@ project(test_ranger)
 find_package(igraph REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/tests)
 
 # Add the executable
 add_executable(power_ranger src/main.c src/algorithms.c src/data.c src/output.c src/simulation.c)
 add_executable(test_ranger tests/test.c)
 
 target_link_libraries(power_ranger PUBLIC igraph::igraph)
+target_link_libraries(test_ranger PUBLIC igraph::igraph)
 
 # target include directory for config folder
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/config)
