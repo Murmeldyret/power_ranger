@@ -150,8 +150,6 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
 
         send_data(graph, routers, traffic, events_temp, routers_temp, links_temp, i, &out_data->total_power_consumption[i]);
 
-        printf("Power consumption: %f\n", out_data->total_power_consumption[i]);
-
         /* Free memory */
         free(events_temp);
         free(routers_temp);
