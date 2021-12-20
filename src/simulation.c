@@ -1,24 +1,20 @@
 #include "simulation.h"
 #include <time.h>
 
-#define EVENT_COUNT 1000
-/* In seconds */
-#define SIMULATION_TIME 3600
-
 /**
  * Description: Run simulation of network
  * Inputs: Validated data
  * Output: struct simulationData
  */
-void run_simulation(struct routerType *routers, struct trafficType *traffic, simulationData *out_data)
+void run_simulation(struct routerType *routers, struct trafficType *traffic, simulationData *out_data, const sim_setup *setup)
 {
     // Initialize variables for populate network
     int nodes;
     int edges;
     igraph_t graph;
 
-    nodes = 1000;
-    edges = 3;
+    nodes = setup->nodes;
+    edges = setup->edges_per_node;
 
     router *routers_array = (router *)malloc(nodes * sizeof(struct router));
     link_e *links_array = (link_e *)malloc(nodes * edges * sizeof(link_e));
@@ -30,7 +26,7 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic, sim
     out_data->total_nodes = nodes;
     out_data->total_links = (int)igraph_ecount(&graph);
 
-    run_simulation_loop(&graph, routers, traffic, routers_array, links_array, out_data);
+    run_simulation_loop(&graph, routers, traffic, routers_array, links_array, setup, out_data);
 
     // Free memory
 
@@ -124,7 +120,7 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
  * Inputs: Validated data, graph
  * Output: struct simulationData
  */
-void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, router *routers_array, link_e *links_array, simulationData *out_data)
+void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, router *routers_array, link_e *links_array, const sim_setup *setup, simulationData *out_data)
 {
     // Initialize variables
 
@@ -132,23 +128,23 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
 
     // Initialise router utilisation array
 
-    events = (event *)malloc(sizeof(event) * EVENT_COUNT);
+    events = (event *)malloc(sizeof(event) * setup->event_count);
 
     // Create random events
-    create_events(graph, traffic, events);
+    create_events(graph, traffic, setup, events);
 
-    out_data->total_amount_of_data = cal_total_data(events, EVENT_COUNT);
+    out_data->total_amount_of_data = cal_total_data(events, setup->event_count);
 
     /* Run simulation. Runs the simulation 3 times. i = 0 is for static, i = 1 is for dynamic, i = 2 is for dynamic with sleep */
     for (int i = 0; i < 3; i++)
     {
         /* Copy events, routers and links to temporary variables in function */
-        event *events_temp = (event *)malloc(sizeof(event) * EVENT_COUNT);
+        event *events_temp = (event *)malloc(sizeof(event) * setup->event_count);
         router *routers_temp = (router *)malloc(out_data->total_nodes * sizeof(struct router));
         link_e *links_temp = (link_e *)malloc(out_data->total_links * sizeof(struct link_e));
-        copy_sim_data(graph, events, routers_array, links_array, events_temp, routers_temp, links_temp);
+        copy_sim_data(graph, events, routers_array, links_array, setup, events_temp, routers_temp, links_temp);
 
-        send_data(graph, routers, traffic, events_temp, routers_temp, links_temp, i, &out_data->total_power_consumption[i]);
+        send_data(graph, routers, traffic, events_temp, routers_temp, links_temp, setup, i, &out_data->total_power_consumption[i]);
 
         /* Free memory */
         free(events_temp);
@@ -157,7 +153,7 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
     }
 
     /* Free memory */
-    for (int i = 0; i < EVENT_COUNT; i++)
+    for (int i = 0; i < setup->event_count; i++)
     {
         igraph_vector_destroy(&events[i].path);
         igraph_vector_destroy(&events[i].path_edges);
@@ -165,13 +161,13 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
     free(events);
 }
 
-void create_events(igraph_t *graph, trafficType *traffic, event *events)
+void create_events(igraph_t *graph, trafficType *traffic, const sim_setup *setup, event *events)
 {
     int i;
 
-    for (i = 0; i < EVENT_COUNT; i++)
+    for (i = 0; i < setup->event_count; i++)
     {
-        events[i].time = (rand() % SIMULATION_TIME) + 1;
+        events[i].time = (rand() % setup->simulation_time) + 1;
         events[i].type = (rand() % NMBR_OF_TRAFFICTYPES);
         events[i].is_active = false;
         events[i].source_id = (rand() % igraph_vcount(graph));
@@ -197,11 +193,11 @@ double cal_total_data(const event *events, int event_count)
     return total_data;
 }
 
-void copy_sim_data(igraph_t *graph, event *events, router *routers, link_e *links, event *events_temp, router *routers_temp, link_e *links_temp)
+void copy_sim_data(igraph_t *graph, event *events, router *routers, link_e *links, const sim_setup *setup, event *events_temp, router *routers_temp, link_e *links_temp)
 {
     int i;
     /* Copy events */
-    for (i = 0; i < EVENT_COUNT; i++)
+    for (i = 0; i < setup->event_count; i++)
     {
         events_temp[i].time = events[i].time;
         events_temp[i].type = events[i].type;
@@ -265,7 +261,7 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
  * Inputs: Validated data, graph, router properties, event properties, test state, total power consumption
  * Output: total power consumption
  */
-void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events, router *router_array, link_e *links_array, int test_state, double *total_power_con)
+void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events, router *router_array, link_e *links_array, const sim_setup *setup, int test_state, double *total_power_con)
 {
     /* Initialize variables */
     double temp_power_consumption = 0;
@@ -283,10 +279,10 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
     }
 
     /* Run simulation and loop while there are ongoing events */
-    while (clock < SIMULATION_TIME * 1000 || ongoing_events) // TODO: Change && to || because else ongoing events won't count. However for debugging it is practical to not include ongoing events for now.
+    while (clock < setup->simulation_time * 1000 || ongoing_events) // TODO: Change && to || because else ongoing events won't count. However for debugging it is practical to not include ongoing events for now.
     {
         /* Check if there are any events */
-        for (int i = 0; i < EVENT_COUNT; i++)
+        for (int i = 0; i < setup->event_count; i++)
         {
             if (events[i].time * 1000 == clock)
             {
@@ -317,7 +313,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         /* Handle ongoing events */
         if (ongoing_events)
         {
-            for (int i = 0; i < EVENT_COUNT; i++)
+            for (int i = 0; i < setup->event_count; i++)
             {
                 if (events[i].time * 1000 < clock && events[i].data > 0)
                 {

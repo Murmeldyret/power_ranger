@@ -33,3 +33,11 @@ typedef struct event
     igraph_vector_t path_edges; // Indexes of links in the path.
 
 } event;
+
+typedef struct sim_setup
+{
+    int event_count;
+    int simulation_time;
+    int nodes;
+    int edges_per_node;
+}sim_setup;
