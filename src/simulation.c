@@ -1,9 +1,9 @@
 #include "simulation.h"
 #include <time.h>
 
-#define EVENT_COUNT 100
+#define EVENT_COUNT 1000
 /* In seconds */
-#define SIMULATION_TIME 360
+#define SIMULATION_TIME 3600
 
 /**
  * Description: Run simulation of network
@@ -17,7 +17,7 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic, sim
     int edges;
     igraph_t graph;
 
-    nodes = 2;
+    nodes = 1000;
     edges = 3;
 
     router *routers_array = (router *)malloc(nodes * sizeof(struct router));
@@ -297,7 +297,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
                 add_event_to_links(i, &events[i].path_edges, links_array);
 
                 /* Awake sleeping routers */
-                wake_up_routers(graph, routers, router_array, &events[i].path, events[i].latency);
+                wake_up_routers(graph, routers, router_array, &events[i].path, &events[i].latency);
 
                 /* Set event to active */
                 events[i].is_active = true;
@@ -362,11 +362,11 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         {
             cal_power_consumption(igraph_vcount(graph), router_array, routers, &temp_power_consumption);
 
-            /* Check if power consumption is greater than 1 MW */
-            if (temp_power_consumption > 1000000)
+            /* Check if power consumption is greater than 1 kW */
+            if (temp_power_consumption > 1000)
             {
-                temp_power_MW += temp_power_consumption / 1000000;
-                temp_power_consumption -= 1000000;
+                temp_power_MW += temp_power_consumption / 1000;
+                temp_power_consumption -= 1000;
             }
         }
 
@@ -587,11 +587,11 @@ void cal_power_consumption(int router_len, router *router_array, struct routerTy
         {
         case 2:
             offset = (1000 - t_routers[router_array[i].type].wakeup_time) / 1000;
-            temp_power_con[i] = t_routers[router_array[i].type].power.sleep * (1 - offset);
+            temp_power_con[i] = (t_routers[router_array[i].type].power.sleep / 3.6) * (1 - offset);
             router_array[i].sleeping = 0; /* Set sleeping to 0 since the power consumption is calculated */
 
         case 0:
-            temp_power_con[i] = linear_power_con(t_routers[router_array[i].type].power.idle, t_routers[router_array[i].type].power.peak, router_array[i].utilisation, offset);
+            temp_power_con[i] += linear_power_con(t_routers[router_array[i].type].power.idle, t_routers[router_array[i].type].power.peak, router_array[i].utilisation, offset);
             break;
 
         case 1:
@@ -609,8 +609,8 @@ void cal_power_consumption(int router_len, router *router_array, struct routerTy
         power_sum += temp_power_con[i];
     }
 
-    /* Add sum to power consumption and convert back to Wh */
-    *power_con += power_sum * 3.6;
+    /* Add sum to power consumption and convert back to Watts */
+    *power_con += power_sum / 1000;
 
     /* Free memory */
     free(temp_power_con);
