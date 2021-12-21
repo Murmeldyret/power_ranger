@@ -3,7 +3,6 @@
 #include "simulation.h"
 #include "output.h"
 
-
 void recieve_setup(sim_setup *);
 
 /*
@@ -17,22 +16,18 @@ int main(void)
     trafficType traffictypes[NMBR_OF_TRAFFICTYPES];
     simulationData data;
     sim_setup setup;
-    printf("🗿ඞ\n");
 
     recieve_setup(&setup);
 
     data.total_events = setup.event_count;
 
     initialise_data(routertypes, traffictypes);
-    //prints structs of relevant type
-    //printRouterTypeElements(routertypes[0]);
-    //printTrafficTypeElements(traffictypes[0]);
 
     run_simulation(routertypes, traffictypes, &data, &setup);
 
     display_data(&data);
 
-    return EXIT_SUCCESS; /* Successful termination */
+    return EXIT_SUCCESS;
 }
 
 void recieve_setup(sim_setup *setup)
