@@ -1,32 +1,32 @@
 #include "simulation.h"
 #include <time.h>
 
-#define EVENT_COUNT 100
-/* In seconds */
-#define SIMULATION_TIME 100
-
 /**
  * Description: Run simulation of network
  * Inputs: Validated data
  * Output: struct simulationData
  */
-void run_simulation(struct routerType *routers, struct trafficType *traffic)
+void run_simulation(struct routerType *routers, struct trafficType *traffic, simulationData *out_data, const sim_setup *setup)
 {
     // Initialize variables for populate network
     int nodes;
     int edges;
     igraph_t graph;
 
-    nodes = 100;
-    edges = 3;
+    nodes = setup->nodes;
+    edges = setup->edges_per_node;
 
     router *routers_array = (router *)malloc(nodes * sizeof(struct router));
-    link *links_array = (link *)malloc(nodes * edges * sizeof(link));
+    link_e *links_array = (link_e *)malloc(nodes * edges * sizeof(link_e));
 
     // Initialize array of Router
     populate_network(nodes, edges, &graph, routers_array, links_array, routers);
 
-    run_simulation_loop(&graph, routers, traffic, routers_array, links_array);
+    /* Add setup data to out_data */
+    out_data->total_nodes = nodes;
+    out_data->total_links = (int)igraph_ecount(&graph);
+
+    run_simulation_loop(&graph, routers, traffic, routers_array, links_array, setup, out_data);
 
     // Free memory
 
@@ -48,7 +48,7 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic)
  * Inputs: Validated data
  * Output: struct graph
  */
-void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *routers, link *links_array, routerType *routers_types)
+void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *routers, link_e *links_array, routerType *routers_types)
 {
     // Initialize variables
     igraph_vector_t edges;
@@ -72,7 +72,8 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
     {
         routers[i].type = rand() % NMBR_OF_ROUTERTYPES;
         routers[i].utilisation = 0;
-        routers[i].sleeping = false;
+        routers[i].sleeping = 0;
+        routers[i].inactivity_counter = 0;
         igraph_vector_init(&routers[i].att_links, 0);
     }
 
@@ -80,7 +81,7 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
     igraph_get_edgelist(graph, &edges, false);
 
     /* Populate links array */
-    links_array = (link *)realloc(links_array, igraph_ecount(graph) * sizeof(struct link));
+    links_array = (link_e *)realloc(links_array, igraph_ecount(graph) * sizeof(struct link_e));
 
     /* Initialize links array */
     j = 0;
@@ -119,7 +120,7 @@ void populate_network(int nodes, int edges_per_node, igraph_t *graph, router *ro
  * Inputs: Validated data, graph
  * Output: struct simulationData
  */
-void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, router *routers_array, link *links_array)
+void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, router *routers_array, link_e *links_array, const sim_setup *setup, simulationData *out_data)
 {
     // Initialize variables
 
@@ -127,16 +128,32 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
 
     // Initialise router utilisation array
 
-    events = (event *)malloc(sizeof(event) * EVENT_COUNT);
+    events = (event *)malloc(sizeof(event) * setup->event_count);
 
     // Create random events
-    create_events(graph, traffic, events);
+    create_events(graph, traffic, setup, events);
 
-    // Run simulation
-    send_data(graph, routers, traffic, events, routers_array, links_array);
+    out_data->total_amount_of_data = cal_total_data(events, setup->event_count);
+
+    /* Run simulation. Runs the simulation 3 times. i = 0 is for static, i = 1 is for dynamic, i = 2 is for dynamic with sleep */
+    for (int i = 0; i < 3; i++)
+    {
+        /* Copy events, routers and links to temporary variables in function */
+        event *events_temp = (event *)malloc(sizeof(event) * setup->event_count);
+        router *routers_temp = (router *)malloc(out_data->total_nodes * sizeof(struct router));
+        link_e *links_temp = (link_e *)malloc(out_data->total_links * sizeof(struct link_e));
+        copy_sim_data(graph, events, routers_array, links_array, setup, events_temp, routers_temp, links_temp);
+
+        send_data(graph, routers, traffic, events_temp, routers_temp, links_temp, setup, i, out_data);
+
+        /* Free memory */
+        free(events_temp);
+        free(routers_temp);
+        free(links_temp);
+    }
 
     /* Free memory */
-    for (int i = 0; i < EVENT_COUNT; i++)
+    for (int i = 0; i < setup->event_count; i++)
     {
         igraph_vector_destroy(&events[i].path);
         igraph_vector_destroy(&events[i].path_edges);
@@ -144,13 +161,13 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
     free(events);
 }
 
-void create_events(igraph_t *graph, trafficType *traffic, event *events)
+void create_events(igraph_t *graph, trafficType *traffic, const sim_setup *setup, event *events)
 {
     int i;
 
-    for (i = 0; i < EVENT_COUNT; i++)
+    for (i = 0; i < setup->event_count; i++)
     {
-        events[i].time = (rand() % SIMULATION_TIME) + 1;
+        events[i].time = (rand() % setup->simulation_time) + 1;
         events[i].type = (rand() % NMBR_OF_TRAFFICTYPES);
         events[i].is_active = false;
         events[i].source_id = (rand() % igraph_vcount(graph));
@@ -164,18 +181,75 @@ void create_events(igraph_t *graph, trafficType *traffic, event *events)
     }
 }
 
+double cal_total_data(const event *events, int event_count)
+{
+    double total_data = 0;
+    int i;
+    for (i = 0; i < event_count; i++)
+    {
+        total_data += events[i].data / 1024 / 1024;
+    }
+
+    return total_data;
+}
+
+void copy_sim_data(igraph_t *graph, event *events, router *routers, link_e *links, const sim_setup *setup, event *events_temp, router *routers_temp, link_e *links_temp)
+{
+    int i;
+    /* Copy events */
+    for (i = 0; i < setup->event_count; i++)
+    {
+        events_temp[i].time = events[i].time;
+        events_temp[i].type = events[i].type;
+        events_temp[i].is_active = events[i].is_active;
+        events_temp[i].source_id = events[i].source_id;
+        events_temp[i].destination_id = events[i].destination_id;
+        events_temp[i].data = events[i].data;
+        events_temp[i].bandwidth = events[i].bandwidth;
+        events_temp[i].available_bandwidth = events[i].available_bandwidth;
+        igraph_vector_init(&events_temp[i].path, 0);
+        igraph_vector_init(&events_temp[i].path_edges, 0);
+        events_temp[i].latency = events[i].latency;
+    }
+
+    /* Copy routers */
+    for (i = 0; i < igraph_vcount(graph); i++)
+    {
+        routers_temp[i].type = routers[i].type;
+        routers_temp[i].utilisation = routers[i].utilisation;
+        routers_temp[i].sleeping = routers[i].sleeping;
+        routers_temp[i].inactivity_counter = routers[i].inactivity_counter;
+        igraph_vector_copy(&routers_temp[i].att_links, &routers[i].att_links);
+    }
+
+    /* Copy links */
+    for (i = 0; i < igraph_ecount(graph); i++)
+    {
+        links_temp[i].max_bandwidth = links[i].max_bandwidth;
+        links_temp[i].remaining_bandwidth = links[i].remaining_bandwidth;
+        links_temp[i].utilisation = links[i].utilisation;
+        igraph_vector_init(&links_temp[i].events, 0);
+    }
+}
+
 /**
  * Description: Connection between nodes and edges
  * Inputs:
  * Output:
  */
-void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, link *links_array, igraph_vector_t *edges, igraph_vector_t *vertices, int from, int to)
+void establish_connections(igraph_t *graph, struct routerType *routers, struct trafficType *traffic, link_e *links_array, igraph_vector_t *edges, igraph_vector_t *vertices, int from, int to, bool *first_run, int state)
 {
     igraph_vector_t weights; // TODO: Move into establish connections so that it doesn't have to be a parameter.
 
     igraph_vector_init(&weights, igraph_ecount(graph));
 
-    cal_link_weights(graph, routers, traffic, links_array, edges, &weights);
+    /* Run only first time if static */
+    if (*first_run == true || state != 0)
+    {
+        *first_run = false;
+        cal_link_weights(graph, routers, traffic, links_array, edges, &weights);
+    }
+
     bellman_ford(graph, vertices, edges, from, to, &weights);
 
     /* Free memory */
@@ -184,17 +258,19 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
 
 /**
  * Description: Send data between nodes and edges
- * Inputs:
- * Output:
+ * Inputs: Validated data, graph, router properties, event properties, test state, total power consumption
+ * Output: total power consumption
  */
-void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events, router *router_array, link *links_array)
+void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event *events, router *router_array, link_e *links_array, const sim_setup *setup, int test_state, simulationData *out_data)
 {
     /* Initialize variables */
-
+    double temp_power_consumption = 0;
+    double temp_power_MW = 0;
     int ongoing_events = 0;
     int clock = 0; /* In milliseconds */
     double data_transfer = 0;
     double progress = 0;
+    bool first_static_run = true;
 
     // Set utilisation to 0
     for (int i = 0; i < igraph_vcount(graph); i++)
@@ -203,18 +279,21 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
     }
 
     /* Run simulation and loop while there are ongoing events */
-    while (clock < SIMULATION_TIME * 1000 || ongoing_events) // TODO: Change && to || because else ongoing events won't count. However for debugging it is practical to not include ongoing events for now.
+    while (clock < setup->simulation_time * 1000 || ongoing_events) // TODO: Change && to || because else ongoing events won't count. However for debugging it is practical to not include ongoing events for now.
     {
         /* Check if there are any events */
-        for (int i = 0; i < EVENT_COUNT; i++)
+        for (int i = 0; i < setup->event_count; i++)
         {
             if (events[i].time * 1000 == clock)
             {
                 // Establish connections
-                establish_connections(graph, routers, traffic, links_array, &events[i].path_edges, &events[i].path, events[i].source_id, events[i].destination_id);
+                establish_connections(graph, routers, traffic, links_array, &events[i].path_edges, &events[i].path, events[i].source_id, events[i].destination_id, &first_static_run, test_state);
 
                 /* Add event to links event list */
                 add_event_to_links(i, &events[i].path_edges, links_array);
+
+                /* Awake sleeping routers */
+                wake_up_routers(graph, routers, router_array, &events[i].path, &events[i].latency);
 
                 /* Set event to active */
                 events[i].is_active = true;
@@ -234,7 +313,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
         /* Handle ongoing events */
         if (ongoing_events)
         {
-            for (int i = 0; i < EVENT_COUNT; i++)
+            for (int i = 0; i < setup->event_count; i++)
             {
                 if (events[i].time * 1000 < clock && events[i].data > 0)
                 {
@@ -274,12 +353,38 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
             }
         }
 
+        /* Calculate power consumption every second */
+        if (clock % 1000 == 0)
+        {
+            cal_power_consumption(igraph_vcount(graph), router_array, routers, &temp_power_consumption);
+
+            /* Check if power consumption is greater than 1 kW */
+            if (temp_power_consumption > 1000)
+            {
+                temp_power_MW += temp_power_consumption / 1000;
+                temp_power_consumption -= 1000;
+            }
+        }
+
+        /* Check if routers should go to sleep */
+        if (test_state == 2 || clock % 1000 == 0)
+        {
+            check_router_activity(igraph_vcount(graph), router_array, routers, links_array);
+        }
+
         /* Move clock forward */
         clock++;
     }
+
+    /* Add remaining temp power consumption to total power consumption */
+    temp_power_MW += temp_power_consumption / 1000000;
+
+    /* Return total power consumption */
+    out_data->total_power_consumption[test_state] = temp_power_MW;
+    out_data->simulation_time[test_state] = clock / 1000; // In seconds
 }
 
-void add_event_to_links(int event_id, igraph_vector_t *path_edges, link *links_array)
+void add_event_to_links(int event_id, igraph_vector_t *path_edges, link_e *links_array)
 {
     for (int i = 0; i < igraph_vector_size(path_edges); i++)
     {
@@ -287,7 +392,30 @@ void add_event_to_links(int event_id, igraph_vector_t *path_edges, link *links_a
     }
 }
 
-void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_array, event *event)
+void wake_up_routers(igraph_t *graph, struct routerType *routers, router *router_array, igraph_vector_t *path, int *latency)
+{
+    int longest_latency = 0;
+    /* Check if routers in the path are sleeping */
+    for (int i = 0; i < igraph_vector_size(path); i++)
+    {
+        if (router_array[(int)igraph_vector_e(path, i)].sleeping)
+        {
+            /* Wake up router */
+            router_array[(int)igraph_vector_e(path, i)].sleeping = 2;
+
+            /* Set latency if it is greater than the current latency */
+            if (routers[router_array[(int)igraph_vector_e(path, i)].type].wakeup_time > longest_latency)
+            {
+                longest_latency = routers[router_array[(int)igraph_vector_e(path, i)].type].wakeup_time;
+            }
+        }
+        router_array[(int)igraph_vector_e(path, i)].inactivity_counter = 0;
+    }
+
+    latency += longest_latency;
+}
+
+void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link_e *links_array, event *event)
 {
     double sum_bandwidth;
     double temp_bandwidth;
@@ -295,18 +423,18 @@ void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_a
 
     igraph_vector_init(&link_overload, 0);
 
-    /* Check if there is enough bandwidth on each link */
+    /* Subtract bandwidth from links */
     for (int i = 0; i < igraph_vector_size(path_edges); i++)
     {
-        sum_bandwidth = 0;
-        /* Sum available bandwidth in every event */
-        for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(path_edges, i)].events); j++)
-        {
-            sum_bandwidth += event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(path_edges, i)].events, j)].available_bandwidth;
-        }
+        links_array[(int)igraph_vector_e(path_edges, i)].remaining_bandwidth -= event[event_id].available_bandwidth;
+    }
+
+    /* Check if there are links that are overloaded */
+    for (int i = 0; i < igraph_vector_size(path_edges); i++)
+    {
 
         /* Check if there is enough bandwidth */
-        if (sum_bandwidth > links_array[(int)igraph_vector_e(path_edges, i)].max_bandwidth)
+        if (links_array[(int)igraph_vector_e(path_edges, i)].remaining_bandwidth < 0)
         {
             igraph_vector_push_back(&link_overload, (int)igraph_vector_e(path_edges, i));
         }
@@ -343,17 +471,6 @@ void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_a
                 double new_bandwidth = bandwidth_percentage[j] * links_array[(int)igraph_vector_e(&link_overload, i)].max_bandwidth;
                 if (event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth > new_bandwidth)
                 {
-                    /* release bandwidth on link if the event is not event_id */
-                    if (igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j) != event_id)
-                    {
-                        temp_bandwidth = event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth - new_bandwidth;
-                        links_array[(int)igraph_vector_e(&link_overload, i)].remaining_bandwidth += temp_bandwidth;
-                    }
-                    else
-                    {
-                        links_array[(int)igraph_vector_e(&link_overload, i)].remaining_bandwidth -= new_bandwidth;
-                    }
-
                     event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth = new_bandwidth;
                 }
             }
@@ -361,18 +478,16 @@ void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_a
             /* Free memory */
             free(bandwidth_percentage);
         }
-    }
-
-    /* Subtract bandwidth from links that are not overloaded */
-    for (int i = 0; i < igraph_vector_size(path_edges); i++)
-    {
-        if (igraph_vector_contains(&link_overload, (int)igraph_vector_e(path_edges, i)))
+        sum_bandwidth = 0;
+        /* Run for all links in path */
+        for (int i = 0; i < igraph_vector_size(path_edges); i++)
         {
-            continue;
-        }
-        else
-        {
-            links_array[(int)igraph_vector_e(path_edges, i)].remaining_bandwidth -= event[event_id].available_bandwidth;
+            /* Calculate remaining bandwidth */
+            for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(path_edges, i)].events); j++)
+            {
+                sum_bandwidth += event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(path_edges, i)].events, j)].bandwidth;
+            }
+            links_array[(int)igraph_vector_e(path_edges, i)].remaining_bandwidth = links_array[(int)igraph_vector_e(path_edges, i)].max_bandwidth - sum_bandwidth;
         }
     }
 
@@ -380,7 +495,7 @@ void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link *links_a
     igraph_vector_destroy(&link_overload);
 }
 
-void sort_links(link *links_array, igraph_vector_t *link_overload)
+void sort_links(link_e *links_array, igraph_vector_t *link_overload)
 {
     int temp;
     for (int i = 0; i < igraph_vector_size(link_overload); i++)
@@ -399,7 +514,7 @@ void sort_links(link *links_array, igraph_vector_t *link_overload)
     }
 }
 
-void cal_utilisation(int router_len, int link_len, router *router_array, link *links_array, event *event)
+void cal_utilisation(int router_len, int link_len, router *router_array, link_e *links_array, event *event)
 {
     /* Iterate through all links */
     for (int i = 0; i < link_len; i++)
@@ -424,7 +539,7 @@ void cal_utilisation(int router_len, int link_len, router *router_array, link *l
     }
 }
 
-void remove_event_from_links(int event_id, igraph_vector_t *path_edges, link *links_array)
+void remove_event_from_links(int event_id, igraph_vector_t *path_edges, link_e *links_array)
 {
     /* Iterate through all links */
     for (int i = 0; i < igraph_vector_size(path_edges); i++)
@@ -441,12 +556,103 @@ void remove_event_from_links(int event_id, igraph_vector_t *path_edges, link *li
     }
 }
 
-void release_bandwidth(int event_id, igraph_vector_t *path_edges, link *links_array, event *events)
+void release_bandwidth(int event_id, igraph_vector_t *path_edges, link_e *links_array, event *events)
 {
     /* Iterate through links affected by event */
     for (int i = 0; i < igraph_vector_size(path_edges); i++)
     {
         /* Release bandwidth */
         links_array[(int)igraph_vector_e(path_edges, i)].remaining_bandwidth += events[event_id].available_bandwidth;
+    }
+}
+
+void cal_power_consumption(int router_len, router *router_array, struct routerType *t_routers, double *power_con)
+{
+    double *temp_power_con = (double *)malloc(sizeof(double) * router_len); /* Temporary power consumption in milliWatts */
+    double power_sum = 0;                                                   /* Sum of power consumption in milliwatts */
+    double offset;                                                          /* Offset of milliseconds to calculate linearly (Used to not calculate for the power used by a router that is starting up) */
+
+    /* Set temp power consumption to 0 */
+    for (int i = 0; i < router_len; i++)
+    {
+        temp_power_con[i] = 0;
+    }
+
+    /* Iterate through all routers */
+    for (int i = 0; i < router_len; i++)
+    {
+        offset = 1;
+        switch (router_array[i].sleeping)
+        {
+        case 2:
+            offset = (1000 - t_routers[router_array[i].type].wakeup_time) / 1000;
+            temp_power_con[i] = (t_routers[router_array[i].type].power.sleep / 3.6) * (1 - offset);
+            router_array[i].sleeping = 0; /* Set sleeping to 0 since the power consumption is calculated */
+
+        case 0:
+            temp_power_con[i] += linear_power_con(t_routers[router_array[i].type].power.idle, t_routers[router_array[i].type].power.peak, router_array[i].utilisation, offset);
+            break;
+
+        case 1:
+            temp_power_con[i] = t_routers[router_array[i].type].power.sleep;
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    /* Calculate sum of power consumption */
+    for (int i = 0; i < router_len; i++)
+    {
+        power_sum += temp_power_con[i];
+    }
+
+    /* Add sum to power consumption and convert back to Watts */
+    *power_con += power_sum / 1000;
+
+    /* Free memory */
+    free(temp_power_con);
+}
+
+void check_router_activity(int router_len, router *router_array, struct routerType *t_routers, link_e *links_array)
+{
+
+    /* Iterate through all routers that are not sleeping */
+
+    for (int i = 0; i < router_len; i++)
+    {
+        if (router_array[i].sleeping == 0)
+        {
+            bool has_events = false;
+            /* This is actually a stupid way of doing this, but there's no time to do it properly */
+
+            /* Check all links connected to router */
+            for (int j = 0; j < igraph_vector_size(&router_array[i].att_links); j++)
+            {
+                /* Check if link has events */
+                if (igraph_vector_size(&links_array[(int)igraph_vector_e(&router_array[i].att_links, j)].events) > 0)
+                {
+                    has_events = true;
+                    break; /* No need to check the rest of the links */
+                }
+            }
+
+            /* If no events are found */
+            if (!has_events)
+            {
+                /* Set inactivity counter 1 up */
+                router_array[i].inactivity_counter++;
+
+                /* If inactivity counter is equal to the inactivity time */
+                if (router_array[i].inactivity_counter == 300)
+                {
+                    /* Set sleeping to 1 */
+                    router_array[i].sleeping = 1;
+                    router_array[i].inactivity_counter = 0;
+                    router_array[i].utilisation = 0;
+                }
+            }
+        }
     }
 }
