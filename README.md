@@ -19,16 +19,19 @@ The main part of the software can be run with this command. However, keep in min
 The user will be prompted to write input parameters. 
 When the user has written the input. The software will run and write an output.csv file that contian the output.
 
+
     Network simulation
     Simulation setup:
-    Number of routers:,1000
-    Number of links:,374750
-    Number of events:,50
-    Total amount of data:,1053.669930,GB
+    Number of routers:,10000
+    Number of links:,59979
+    Number of events:,10000
+    Total amount of data:,213844.047546,GB
 
     Simulation results:,Static,Dynamic,Dynamic with sleep states
-    Power Consumption,47.783264 kWh,47.765712 kWh,31.216188 kWh
-    Time (s),2485.000000 s,2485.000000 s,2485.000000 s
+    Power Consumption,7021.028445 kWh,1477.040533 kWh,950.069879 kWh
+    Time (s),40836.000000 s,4987.000000 s,4987.000000 s
+
+
 
 ## Software Test
 The testing part of the software can be run with this command. However, keep in mind that it is specified for Linux. 
