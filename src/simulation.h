@@ -26,3 +26,4 @@ void cal_utilisation(int, int, router *, link_e *, event *);
 void remove_event_from_links(int, igraph_vector_t *, link_e *);
 void release_bandwidth(int, igraph_vector_t *, link_e *, event *);
 void cal_power_consumption(int, router *, struct routerType *, double *);
+void check_router_activity(int, router *, struct routerType *, link_e *);
