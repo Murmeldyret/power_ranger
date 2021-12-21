@@ -120,12 +120,6 @@ MU_TEST(test_traffic_file_size)
     mu_check(res == traffic_type_size);
 }
 
-MU_TEST(test_correct_data)
-{
-    int res = get_correct_data();
-    mu_check(res == 1);
-}
-
 MU_TEST_SUITE(test_suite) 
 {
     MU_RUN_TEST(test_can_read_router_file);
@@ -133,8 +127,6 @@ MU_TEST_SUITE(test_suite)
 
     MU_RUN_TEST(test_router_file_size);
     MU_RUN_TEST(test_traffic_file_size);
-    
-    MU_RUN_TEST(test_correct_data);
 }
 
 int main(int argc, char *argv[]) 
