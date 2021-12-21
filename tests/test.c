@@ -1,5 +1,5 @@
 #include "minunit.h"
-#include "algorithms.h"
+#include "../src/algorithms.h"
 
 int file_size(FILE *input);
 
@@ -9,6 +9,11 @@ int file_size(FILE *input);
 // Expected results.
 const int router_type_size = 202; // Bytes
 const int traffic_type_size = 315; // Bytes
+
+const double weight_below = 0;
+const double weight_above = 0;
+
+const double power_consumption = 64;
 
 FILE *fp;
 
@@ -60,6 +65,27 @@ int get_traffic_file_size()
     return trafficRes;
 }
 
+// calculate the weight below 80% utilisation
+int can_calculate_weight_below()
+{   
+    double below = f(80);
+    return below;
+}
+
+// calculate the weight above 80% utilisation
+int can_calculate_weight_above()
+{
+    double above = g(80);
+    return above;
+}
+
+// calculate the power consumption of linear
+int can_calculate_linear_power_consumption()
+{
+    double linear = linear_power_con(20, 75, 80, 1);
+    return linear;
+}
+
 // Returns the size of a file in bytes
 int file_size(FILE *input)
 {
@@ -102,6 +128,27 @@ MU_TEST(test_traffic_file_size)
     mu_check(res == traffic_type_size);
 }
 
+// Test to check if the calculation of weights below 80% is equal to the expected.
+MU_TEST(test_calculate_weight_below)
+{
+    int res = can_calculate_weight_below();
+    mu_check(res == weight_below);
+}
+
+// Test to check if the calculation of weights above 80% is equal to the expected.
+MU_TEST(test_calculate_weight_above)
+{
+    int res = can_calculate_weight_above();
+    mu_check(res == weight_above);
+}
+
+// Test to check if the calculation of linear power consumption is equal to the expected.
+MU_TEST(test_calculate_linear_power_consumption)
+{
+    int res = can_calculate_linear_power_consumption();
+    mu_check(res == power_consumption);
+}
+
 MU_TEST_SUITE(test_suite) 
 {
     MU_RUN_TEST(test_can_read_router_file);
@@ -109,6 +156,11 @@ MU_TEST_SUITE(test_suite)
 
     MU_RUN_TEST(test_router_file_size);
     MU_RUN_TEST(test_traffic_file_size);
+
+    MU_RUN_TEST(test_calculate_weight_below);
+    MU_RUN_TEST(test_calculate_weight_above);
+
+    MU_RUN_TEST(test_calculate_linear_power_consumption);
 }
 
 int main(int argc, char *argv[]) 
