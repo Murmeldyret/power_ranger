@@ -60,24 +60,6 @@ int get_traffic_file_size()
     return trafficRes;
 }
 
-
-/*
-int get_correct_data()
-{
-    const char *string = "hello";
-    char buf[100];
-
-    if((fp = fopen("config.txt", "w")) == NULL)
-    {
-        return 0;
-    }
-
-    fclose(fp);
-
-    return 1;
-}
-*/
-
 // Returns the size of a file in bytes
 int file_size(FILE *input)
 {
