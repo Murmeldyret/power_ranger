@@ -1,4 +1,3 @@
-
 #include "data.h"
 #include <stdio.h>
 #include <string.h>
@@ -6,30 +5,31 @@
 
 #define CSV_LINE_LEN 100
 
+#define ROUTER_PATH "config/routerType.csv"
+#define TRAFFIC_PATH "config/trafficType.csv"
+
+FILE *fp;
+
 /**
  * Description: Reads .csv files and outputs to data structures
  * Inputs: return parameters - pointer to the data structure
  * Output: struct *routertypearray, *traffictypearray
  */
-
 bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
 {
     bool routerType;
     bool trafficType;
-    routerType = readRouterType(routertypearray);
-    //printRouterTypeElements(routertypearray[0]);
-    if (routerType == false)
+
+    if(routerType = readRouterType(routertypearray) == false)
     {
         printf("Error in readRouterType \n");
-        return false;
     }
-    
-    trafficType = readTrafficType(traffictypearray);
-    if (trafficType == false)
+
+    if(trafficType = readTrafficType(traffictypearray) == false)
     {
         printf("Error in readTrafficType \n");
-        return false;
     }
+    
     return true;
 }
 
@@ -44,34 +44,25 @@ bool readRouterType(routerType *routertypesarr)
     // TODO ryd op i variabler som ikke bliver brugt.
     char buffer[CSV_LINE_LEN]; 
     char *token;
+    
     int i = 0;
     int j = 1;
-    FILE *frtp = fopen("config/routerType.csv", "r");
-    /* RouterType.csv values are ordered in (seperated by commas) :   id(int), 
-                                                type(int), 
-                                                bandwidth(int), 
-                                                wakeupTime(int), 
-                                                latency(int), 
-                                                powerIdle(int), 
-                                                powerPeak(int), 
-                                                powerSleep(int), 
-                                                packetMemory(int)
-    id,type,bandwidth,wakeupTime,latency,powerIdle,powerPeak,powerSleep,packetMemory;
-    */
-    if(frtp == NULL)
+
+    if((fp = fopen(ROUTER_PATH, "r")) == NULL)
     {
         printf("Error in opening routerType.csv \n");
-        return false;
+        return 0;
     }
+
     // loops until eof is reached
-    while (feof(frtp) == false)
+    while (feof(fp) == false)
     {
         // Outputs current line to buffer char array
-        fgets(buffer,CSV_LINE_LEN,frtp);
+        fgets(buffer, CSV_LINE_LEN, fp);
         j = 1;
 
         // Splits buffer into smaller parts delimited by ","
-        token = strtok(buffer,",");
+        token = strtok(buffer, ",");
         printf("Token: %s\n", token);
         do
         {     
@@ -116,8 +107,9 @@ bool readRouterType(routerType *routertypesarr)
         }  while (token != NULL && j <= 9);
         i++;
     }
-    //Close file, no longer needed
-    fclose(frtp);
+
+    // Close file, no longer needed
+    fclose(fp);
 
     return true;
 }
@@ -145,34 +137,26 @@ void printRouterTypeElements(routerType routerType)
  */
 bool readTrafficType(trafficType *traffictypearr)
 {
-    /*
-    should output to struct in following order:
-    id(int)
-    type(string)[16]
-    latencySensitivity(int)
-    dataSize(int)
-    packetlossSensitivity(int)
-    id,type,latencySensitivity,dataSize,packetLossSensitivity
-    */
     char buffer[CSV_LINE_LEN];
     char *token;
     int i = 0;
     int j;
-    //Opens trafficType.csv file
-    FILE *fttp = fopen("config/trafficType.csv","r");
-    //Checks that the file has been opened with success
-    if(fttp == NULL)
+
+    // Opens trafficType.csv file
+    if((fp = fopen(TRAFFIC_PATH, "r")) == NULL)
     {
+        // Checks that the file has been opened with success
         printf("Error in opening trafficType.csv \n");
         return false;
     }
+
     // loops until eof is reached
-    while (feof(fttp) == false)
+    while (feof(fp) == false)
     {
-        fgets(buffer,CSV_LINE_LEN,fttp);
+        fgets(buffer, CSV_LINE_LEN, fp);
         j = 1;
         // Splits buffer into smaller parts delimited by ","
-        token = strtok(buffer,",");
+        token = strtok(buffer, ",");
         do
         {
             //printf("token: %s\n",token);
@@ -212,7 +196,7 @@ bool readTrafficType(trafficType *traffictypearr)
     i++;
     }
 
-    fclose(fttp);
+    fclose(fp);
     return true;
 }
 
