@@ -14,7 +14,7 @@ The main part of the software can be run with this command. However, keep in min
     ./power_ranger
 
 The user will be prompted to write input parameters. 
-When the user has written the input. The software will run and write an output.txt file that contian the output.
+When the user has written the input. The software will run and write an output.csv file that contian the output.
 
     Network simulation
     Simulation setup:
