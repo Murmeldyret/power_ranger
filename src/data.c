@@ -63,7 +63,6 @@ bool readRouterType(routerType *routertypesarr)
 
         // Splits buffer into smaller parts delimited by ","
         token = strtok(buffer, ",");
-        printf("Token: %s\n", token);
         do
         {     
             //Switches on which struct elements should get token value
@@ -71,7 +70,6 @@ bool readRouterType(routerType *routertypesarr)
             {
             case 1:
                 routertypesarr[i].id = atoi(token);
-                printf("Token: %s\n", token);
                 break;
             case 2:
                 strcpy(routertypesarr[i].type,token);
@@ -159,7 +157,6 @@ bool readTrafficType(trafficType *traffictypearr)
         token = strtok(buffer, ",");
         do
         {
-            //printf("token: %s\n",token);
             //Switches on which struct element should get token value
             switch (j)
             {
