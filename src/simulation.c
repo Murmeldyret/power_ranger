@@ -586,7 +586,7 @@ void cal_power_consumption(int router_len, router *router_array, struct routerTy
         {
         case 2:
             offset = (1000 - t_routers[router_array[i].type].wakeup_time) / 1000;
-            temp_power_con[i] = (t_routers[router_array[i].type].power.sleep / 3.6) * (1 - offset);
+            temp_power_con[i] = (t_routers[router_array[i].type].power.peak / 3.6) * (1 - offset);
             router_array[i].sleeping = 0; /* Set sleeping to 0 since the power consumption is calculated */
 
         case 0:
