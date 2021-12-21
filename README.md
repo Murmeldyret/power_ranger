@@ -1,6 +1,9 @@
-# Power ranger - Energy optimization
+<p align="center">
+  <img src="https://cdn.flickeringmyth.com/wp-content/uploads/2018/01/Mighty_Morphin_Power_Rangers_Season_1_to_3_logo.png" alt="Smiley face" width="40%" height="40%">
+</p>
 
-Power optimisation for computer networks that will optimize and make the internet more energy efficient. 
+# Power ranger - Energy optimization
+Computer network simulation. Calculation the networks power consumption on static, dynamical, and dynamical with sleep mode. 
 
 ## Build
 When building the project it will generate two programs. Power_ranger and Test_ranger. Where power_ranger is the main part of the software, and test_ranger is the testing part of the software.
@@ -37,8 +40,6 @@ Output of the test software should return something along the lines of.
     2 tests, 2 assertions, 0 failures
     Finished in 0.00009168 seconds (real) 0.00008856 seconds (proc)
 
-## Installation Options
-
 ## Configuration files
 Routertype.csv
 
@@ -50,7 +51,6 @@ Traffictype.csv
 | id  | type(string)[16] | latencySensitivity(int) | dataSize (int) | packetlossSensitivity(int) |     |
 | --- | ------------ | ----------------------- | -------------- | -------------------------- | --- |
 | 1   | Movie        | 1000ms                  | 50000KB        | 20000Kbps                  | low |
-
 
 ## Dependencies
 - CMake - https://cmake.org/
