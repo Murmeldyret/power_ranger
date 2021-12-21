@@ -475,17 +475,19 @@ void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link_e *links
                 }
             }
 
-            sum_bandwidth = 0;
-            /* Calculate remaining bandwidth */
-            for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(&link_overload, i)].events); j++)
-            {
-                sum_bandwidth += event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth;
-            }
-
-            links_array[(int)igraph_vector_e(&link_overload, i)].remaining_bandwidth = links_array[(int)igraph_vector_e(&link_overload, i)].max_bandwidth - sum_bandwidth;
-
             /* Free memory */
             free(bandwidth_percentage);
+        }
+        sum_bandwidth = 0;
+        /* Run for all links in path */
+        for (int i = 0; i < igraph_vector_size(path_edges); i++)
+        {
+            /* Calculate remaining bandwidth */
+            for (int j = 0; j < igraph_vector_size(&links_array[(int)igraph_vector_e(path_edges, i)].events); j++)
+            {
+                sum_bandwidth += event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(path_edges, i)].events, j)].bandwidth;
+            }
+            links_array[(int)igraph_vector_e(path_edges, i)].remaining_bandwidth = links_array[(int)igraph_vector_e(path_edges, i)].max_bandwidth - sum_bandwidth;
         }
     }
 
