@@ -20,15 +20,24 @@ bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
     bool routerType;
     bool trafficType;
 
+    printf("-------------------------------------------------------------------------------\n");
+
+    printf("Initialising data...\n");
+    printf("Reading router type data...\n");
+
     if(routerType = readRouterType(routertypearray) == false)
     {
         printf("Error in readRouterType \n");
     }
 
+    printf("Reading traffic type data...\n");
+
     if(trafficType = readTrafficType(traffictypearray) == false)
     {
         printf("Error in readTrafficType \n");
     }
+
+    printf("Data initialised\n");
     
     return true;
 }
@@ -40,8 +49,6 @@ bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
  */
 bool readRouterType(routerType *routertypesarr) 
 {
-    // TODO variabler herop
-    // TODO ryd op i variabler som ikke bliver brugt.
     char buffer[CSV_LINE_LEN]; 
     char *token;
     
@@ -63,7 +70,6 @@ bool readRouterType(routerType *routertypesarr)
 
         // Splits buffer into smaller parts delimited by ","
         token = strtok(buffer, ",");
-        printf("Token: %s\n", token);
         do
         {     
             //Switches on which struct elements should get token value
@@ -71,7 +77,6 @@ bool readRouterType(routerType *routertypesarr)
             {
             case 1:
                 routertypesarr[i].id = atoi(token);
-                printf("Token: %s\n", token);
                 break;
             case 2:
                 strcpy(routertypesarr[i].type,token);
@@ -159,7 +164,6 @@ bool readTrafficType(trafficType *traffictypearr)
         token = strtok(buffer, ",");
         do
         {
-            //printf("token: %s\n",token);
             //Switches on which struct element should get token value
             switch (j)
             {

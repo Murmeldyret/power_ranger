@@ -13,6 +13,8 @@
 
 void display_data(simulationData *data)
 {
+    printf("-------------------------------------------------------------------------------\n");
+    printf("Saving data...\n");
     FILE *fp = fopen("outputs/Output.csv", "w");
 
     /* String of simulation state names */
@@ -38,10 +40,13 @@ void display_data(simulationData *data)
 
     /* Print simulation state and power consumption */
     fprintf(fp, "Simulation results:,%s,%s,%s\n", simulationStateNames[0], simulationStateNames[1], simulationStateNames[2]);
-    fprintf(fp, "%s,%lf kWh,%lf kWh,%lf kWh\n", simulationDataTypes[0], data->total_power_consumption[0], data->total_power_consumption[1], data->total_power_consumption[2]);
+    fprintf(fp, "%s,%lf kW,%lf kW,%lf kW\n", simulationDataTypes[0], data->total_power_consumption[0], data->total_power_consumption[1], data->total_power_consumption[2]);
     fprintf(fp, "%s,%lf s,%lf s,%lf s\n", simulationDataTypes[1], data->simulation_time[0], data->simulation_time[1], data->simulation_time[2]);
 
     fprintf(fp, "\n");
 
     fclose(fp);
+
+    printf("Data saved to outputs/Output.csv\n");
+    printf("-------------------------------------------------------------------------------\n");
 }
