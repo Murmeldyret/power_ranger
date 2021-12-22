@@ -49,8 +49,6 @@ bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
  */
 bool readRouterType(routerType *routertypesarr) 
 {
-    // TODO variabler herop
-    // TODO ryd op i variabler som ikke bliver brugt.
     char buffer[CSV_LINE_LEN]; 
     char *token;
     
