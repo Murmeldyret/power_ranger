@@ -41,7 +41,7 @@ void recieve_setup(sim_setup *setup)
     scanf("%d", &setup->edges_per_node);
     printf("-------------------------------------------------------------------------------\n");
     printf("NOTICE: The simulation will continue to run if there is still data to be sent.\n");
-    printf("Enter the amount of time to simulate in seconds: ");
+    printf("Enter the amount of time to simulate in seconds (The spawn time of events): ");
     scanf("%d", &setup->simulation_time);
     printf("-------------------------------------------------------------------------------\n");
     printf("Enter the number of events to be simulated: ");
