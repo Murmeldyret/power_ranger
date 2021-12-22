@@ -388,7 +388,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
 
     /* Return total power consumption */
     out_data->total_power_consumption[test_state] = temp_power_MW;
-    out_data->simulation_time[test_state] = clock / 1000; // In seconds
+    out_data->simulation_time[test_state] = (double)clock / 1000; // In seconds
 }
 
 void add_event_to_links(int event_id, igraph_vector_t *path_edges, link_e *links_array)
