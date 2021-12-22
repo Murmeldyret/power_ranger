@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://cdn.flickeringmyth.com/wp-content/uploads/2018/01/Mighty_Morphin_Power_Rangers_Season_1_to_3_logo.png" alt="Smiley face" width="40%" height="40%">
-</p>
-
 # Power ranger - Energy optimization
 Computer network simulation. Calculation the networks power consumption on static, dynamical, and dynamical with sleep mode. 
 
