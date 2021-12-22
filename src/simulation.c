@@ -473,7 +473,7 @@ void bandwidth_balancer(int event_id, igraph_vector_t *path_edges, link_e *links
                 {
                     event[(int)igraph_vector_e(&links_array[(int)igraph_vector_e(&link_overload, i)].events, j)].available_bandwidth = new_bandwidth;
                 }
-            }
+            }   
 
             /* Free memory */
             free(bandwidth_percentage);

@@ -20,6 +20,7 @@ int main(void)
     recieve_setup(&setup);
 
     data.total_events = setup.event_count;
+    data.user_simulation_time = setup.simulation_time;
 
     initialise_data(routertypes, traffictypes);
 
