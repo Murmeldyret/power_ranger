@@ -4,6 +4,7 @@ typedef struct simulationData
 {
     double total_power_consumption[3]; //Power consumed by network
     double simulation_time[3];         //Time taken to complete simulation in seconds
+    int user_simulation_time;          //Time period where events will spawn
     int total_nodes;                   //Total number of nodes in network
     int total_links;                   //Total number of links in network
     int total_events;                  //Total number of events in network

@@ -32,6 +32,7 @@ void display_data(simulationData *data)
 
     fprintf(fp, "Network simulation\n");
     fprintf(fp, "Simulation setup:\n");
+    fprintf(fp, "Event spawn time:,%d\n", data->user_simulation_time);
     fprintf(fp, "Number of routers:,%d\n", data->total_nodes);
     fprintf(fp, "Number of links:,%d\n", data->total_links);
     fprintf(fp, "Number of events:,%d\n", data->total_events);
