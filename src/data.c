@@ -20,15 +20,24 @@ bool initialise_data(routerType *routertypearray, trafficType *traffictypearray)
     bool routerType;
     bool trafficType;
 
+    printf("-------------------------------------------------------------------------------\n");
+
+    printf("Initialising data...\n");
+    printf("Reading router type data...\n");
+
     if(routerType = readRouterType(routertypearray) == false)
     {
         printf("Error in readRouterType \n");
     }
 
+    printf("Reading traffic type data...\n");
+
     if(trafficType = readTrafficType(traffictypearray) == false)
     {
         printf("Error in readTrafficType \n");
     }
+
+    printf("Data initialised\n");
     
     return true;
 }
