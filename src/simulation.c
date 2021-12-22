@@ -19,6 +19,10 @@ void run_simulation(struct routerType *routers, struct trafficType *traffic, sim
     router *routers_array = (router *)malloc(nodes * sizeof(struct router));
     link_e *links_array = (link_e *)malloc(nodes * edges * sizeof(link_e));
 
+    printf("-------------------------------------------------------------------------------\n");
+    printf("Starting simulation...\n");
+    printf("Populating network...\n");
+
     // Initialize array of Router
     populate_network(nodes, edges, &graph, routers_array, links_array, routers);
 
@@ -138,6 +142,7 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
     /* Run simulation. Runs the simulation 3 times. i = 0 is for static, i = 1 is for dynamic, i = 2 is for dynamic with sleep */
     for (int i = 0; i < 3; i++)
     {
+        printf("Running simulation %d/3...\n", i + 1);
         /* Copy events, routers and links to temporary variables in function */
         event *events_temp = (event *)malloc(sizeof(event) * setup->event_count);
         router *routers_temp = (router *)malloc(out_data->total_nodes * sizeof(struct router));
@@ -151,6 +156,8 @@ void run_simulation_loop(igraph_t *graph, struct routerType *routers, struct tra
         free(routers_temp);
         free(links_temp);
     }
+
+    printf("Simulation finished.\n");
 
     /* Free memory */
     for (int i = 0; i < setup->event_count; i++)
@@ -247,7 +254,7 @@ void establish_connections(igraph_t *graph, struct routerType *routers, struct t
     if (*first_run == true || state != 0)
     {
         *first_run = false;
-        cal_link_weights(graph, routers, traffic, links_array, edges, &weights);
+        cal_link_weights(graph, links_array, edges, &weights);
     }
 
     bellman_ford(graph, vertices, edges, from, to, &weights);

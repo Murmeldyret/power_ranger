@@ -13,6 +13,8 @@
 
 void display_data(simulationData *data)
 {
+    printf("-------------------------------------------------------------------------------\n");
+    printf("Saving data...\n");
     FILE *fp = fopen("outputs/Output.csv", "w");
 
     /* String of simulation state names */
@@ -43,4 +45,7 @@ void display_data(simulationData *data)
     fprintf(fp, "\n");
 
     fclose(fp);
+
+    printf("Data saved to outputs/Output.csv\n");
+    printf("-------------------------------------------------------------------------------\n");
 }
