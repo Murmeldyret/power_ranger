@@ -22,6 +22,7 @@ When the user has written the input. The software will run and write an output.c
 
     Network simulation
     Simulation setup:
+    Event spawn time:,3600
     Number of routers:,10000
     Number of links:,59979
     Number of events:,10000
