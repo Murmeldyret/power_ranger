@@ -8,7 +8,7 @@
  * Output: distance, predecessor
  */
 void bellman_ford(igraph_t *graph, igraph_vector_t *vertices, igraph_vector_t *edges, igraph_integer_t from, igraph_integer_t to, igraph_vector_t *weights)
-{    
+{
     igraph_get_shortest_path_bellman_ford(graph,
                                           vertices,
                                           edges,
@@ -16,9 +16,6 @@ void bellman_ford(igraph_t *graph, igraph_vector_t *vertices, igraph_vector_t *e
                                           to,
                                           weights,
                                           IGRAPH_ALL);
-
-    
-    
 }
 
 /**
@@ -31,10 +28,7 @@ void cal_link_weights(igraph_t *graph, link_e *links_array, igraph_vector_t *edg
 {
     int i;
     int j;
-    
-    igraph_vector_t router_weights;
 
-    igraph_vector_init(&router_weights, igraph_vcount(graph));
     igraph_get_edgelist(graph, edges, false);
 
     /* Calculate the weight of each router */
@@ -82,7 +76,6 @@ double linear_power_con(int idle, int peak, double utilisation, double offset)
     /* Convert from Wh to mWs */
     double idle_mW = idle / 3.6;
     double peak_mW = peak / 3.6;
-
 
     /* Calculate a and b in a linear function */
     double a = (peak - idle) / 100.0;
