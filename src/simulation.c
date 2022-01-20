@@ -352,6 +352,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
             }
         }
 
+        /* WTF is this? */
         for (int i = 0; i < igraph_vector_size(&events->path); i++)
         {
             if (routers[router_array[i].type].power.peak)
@@ -368,13 +369,13 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
             /* Check if power consumption is greater than 1 kW */
             if (temp_power_consumption > 1000)
             {
-                temp_power_MW += temp_power_consumption / 1000;
+                temp_power_MW += 1;
                 temp_power_consumption -= 1000;
             }
         }
 
-        /* Check if routers should go to sleep */
-        if (test_state == 2 || clock % 1000 == 0)
+        /* Check if routers should go to sleep */ // TODO: Explain why this was an or instead of and.
+        if (test_state == 2 && clock % 1000 == 0)
         {
             check_router_activity(igraph_vcount(graph), router_array, routers, links_array);
         }
@@ -384,7 +385,7 @@ void send_data(igraph_t *graph, routerType *routers, trafficType *traffic, event
     }
 
     /* Add remaining temp power consumption to total power consumption */
-    temp_power_MW += temp_power_consumption / 1000000;
+    temp_power_MW += temp_power_consumption / 1000;
 
     /* Return total power consumption */
     out_data->total_power_consumption[test_state] = temp_power_MW;
